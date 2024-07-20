@@ -30,19 +30,17 @@ public class Cliente {
     @OneToMany(mappedBy ="cliente", cascade = CascadeType.MERGE)
     @JsonIgnore
     @ToString.Exclude
-    private List<Carrello> cart ;
+    private List<Ordine> ordini ;
 
-    @Basic
-    @Column(name = "username", nullable = false)
-    private String username;
+    @OneToOne
+    @JsonIgnore
+    private Carrello carrello;
 
     @Basic
     @Column(name="email", nullable= false)
     private String email;
 
-    @Basic
-    @Column(name="password", nullable= false)
-    private String password;
+
 
 
 
