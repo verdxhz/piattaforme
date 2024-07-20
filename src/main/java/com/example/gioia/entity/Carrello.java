@@ -2,6 +2,7 @@ package com.example.gioia.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,16 +26,16 @@ public class Carrello {
     @Column(name = "id", nullable = false)
     private int id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "cliente")
     private Cliente cliente;
 
-    @Basic
-    @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
-    @Column(name = "data", nullable = false)
-    private Date data;
-
     @OneToMany(mappedBy ="carrello")
     private List<Prodotti_Carrello> prodotti;
+
+    @Version
+    @JsonIgnore
+    @ToString.Exclude
+    @Column(name = "version")
+    private long version;
 }

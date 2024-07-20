@@ -18,7 +18,6 @@ public class ProdottiController {
     @Autowired
     private ProdottiService prodottiService;
 
-
     @PostMapping()
     //@PreAuthorize("hasRole=amm")
     public ResponseEntity creaProdotto(@RequestBody Prodotto prodotto) {
@@ -40,6 +39,7 @@ public class ProdottiController {
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
+
     @PutMapping("/update")
     //@PreAuthorize("hasRole=amm")
     public ResponseEntity aggiornaProdotto(@RequestBody Prodotto prodotto) {
@@ -51,39 +51,64 @@ public class ProdottiController {
         }
     }
 
-    public Prodotto getProductByID(@RequestParam int id) {
-        return prodottiService.getProdotto(id);
+    @GetMapping("/one")
+    //@PreAuthorize("hasRole=all")
+    public ResponseEntity getProductByID(@RequestParam int id) {
+        try{
+            Prodotto res= prodottiService.getProdotto(id);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @GetMapping("/prodotto/all")
+    @GetMapping("/all")
     //@PreAuthorize("hasRole=all")
-    public List<Prodotto> getProdotti(@RequestParam(required = false, defaultValue = "0")int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag, @PathVariable String ordine) {
+    public List<Prodotto> getProdotti(@RequestParam(required = false, defaultValue = "0")int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag, @RequestParam String ordine) {
         return prodottiService.mostraProdotti(numPag,dimPag,ordine);
     }
 
-
-    @GetMapping("/prodotto/nome")
+    @GetMapping("/nome")
     //@PreAuthorize("hasRole=all")
-
-    public List<Prodotto> getProdottiNome(@PathVariable String nome,@PathVariable int numPag, @PathVariable int dimPag) {
-        return prodottiService.mostraProdottiNome(nome,numPag,dimPag);
+    public ResponseEntity getProdottiNome(@RequestParam String nome,@RequestParam int numPag, @RequestParam int dimPag) {
+        try{
+            List<Prodotto> res= prodottiService.mostraProdottiNome(nome,numPag,dimPag);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
-
-    @GetMapping("/prodotto/categoria")
+    @GetMapping("/categoria")
     //@PreAuthorize("hasRole=all")
-
-
-    public List<Prodotto> getProdottiCategoria(@PathVariable String categoria,@PathVariable int numPag, @PathVariable int dimPag, @PathVariable String ordine) {
-        return prodottiService.mostraProdottiCategoria(categoria,numPag,dimPag,ordine);
+    public ResponseEntity getProdottiCategoria(@RequestParam String categoria,@RequestParam int numPag, @RequestParam int dimPag, @RequestParam String ordine) {
+        try{
+            List<Prodotto> res= prodottiService.mostraProdottiCategoria(categoria,numPag,dimPag,ordine);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
-
-    @GetMapping("/prodotto/prezzo")
+    @GetMapping("/prezzo")
     //@PreAuthorize("hasRole=all")
-
-    public List<Prodotto> getProdottiPrezzo(@PathVariable int min, @PathVariable int max,@PathVariable int numPag, @PathVariable int dimPag, @PathVariable String ordine) {
-        return prodottiService.mostraProdottiPrezzo(min, max,numPag,dimPag,ordine);
+    public ResponseEntity getProdottiPrezzo(@RequestParam int min, @RequestParam int max,@RequestParam int numPag, @RequestParam int dimPag, @RequestParam String ordine) {
+        try{
+            List<Prodotto> res= prodottiService.mostraProdottiPrezzo(min, max,numPag,dimPag,ordine);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
+    @GetMapping("/terminati")
+    //PreAuthorize("hasRole=amm")
+    public ResponseEntity getTerminati(){
+        try{
+            List<Prodotto> res= prodottiService.getProdottiTerminati();
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

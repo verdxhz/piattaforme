@@ -16,11 +16,9 @@ public interface CarrelloRepository extends JpaRepository<Carrello, Integer> {
     public Carrello findById(int id);
     @Query("select o from Carrello o where o.cliente.id_cliente=?1")
     public List<Carrello> findByclient(int client);
-    //ricerca più complessa
-    @Query("select o from Carrello o where o.data>=?1 and o.data<= ?2")
-    public List<Carrello> findByIntervalloTempo(Date inizio, Date fine);
+
     //verifica esistenza
-    boolean existsByCliente(Cliente cliente);
+    boolean existsById(int id);
 }
 
 

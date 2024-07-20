@@ -36,12 +36,5 @@ public class Cliente {
     @JsonIgnore
     private Carrello carrello;
 
-    @Basic
-    @Column(name="email", nullable= false)
-    private String email;
-
-
-
-
 
 }

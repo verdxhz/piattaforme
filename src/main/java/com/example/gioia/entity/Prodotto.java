@@ -46,11 +46,7 @@ public class Prodotto {
     @Column(name = "immagine", nullable = false)
     private String immagine;
 
-    @Version
-    @JsonIgnore
-    @ToString.Exclude
-    @Column(name = "version")
-    private long version;
+
 
     @OneToMany(mappedBy = "prodotto")
     @JsonIgnore

@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/cliente")
 public class ClientiController {
+
     @Autowired
     private ClientiService clientiService;
 
@@ -28,38 +29,49 @@ public class ClientiController {
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
+
     @PutMapping("/update")
     //@PreAuthorize("hasRole=amm")
-
-    public Cliente update(@RequestParam Cliente cliente){
-        return clientiService.updateCliente(cliente);
+    public ResponseEntity update(@RequestParam Cliente cliente){
+        try{
+            Cliente res = clientiService.updateCliente(cliente);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
+
     @DeleteMapping("/update")
    // @PreAuthorize("hasRole=amm")
-
-    public void delete(@RequestParam Cliente cliente){
-        clientiService.removeCliente(cliente);
+    public ResponseEntity delete(@RequestParam Cliente cliente){
+        try{
+            clientiService.removeCliente(cliente);
+            return new ResponseEntity(cliente, HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/all")
    // @PreAuthorize("hasRole=amm")
-
-    public List<Cliente> getClienti(){
-        return clientiService.mostraClienti();
-    }
-
-    @GetMapping("/email")
-   // @PreAuthorize("hasRole=amm")
-
-    public Cliente getClienteEmail(@RequestParam String email){
-        return clientiService.mostraClientiEmail(email);
+    public ResponseEntity getClienti(){
+        try{
+            List<Cliente> res = clientiService.mostraClienti();
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/nome")
     //@PreAuthorize("hasRole=amm")
-
-    public List<Cliente> getClientiNome(@RequestParam String nome){
-        return clientiService.mostraClientiNome(nome);
+    public ResponseEntity getClientiNome(@RequestParam String nome){
+        try{
+            List<Cliente> res = clientiService.mostraClientiNome(nome);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch(Exception e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

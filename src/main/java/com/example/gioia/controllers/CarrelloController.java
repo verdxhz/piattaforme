@@ -2,9 +2,9 @@ package com.example.gioia.controllers;
 
 import com.example.gioia.entity.Carrello;
 import com.example.gioia.entity.Cliente;
+import com.example.gioia.entity.Ordine;
 import com.example.gioia.entity.Prodotto;
 import com.example.gioia.service.CarrelloService;
-import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,65 +21,126 @@ public class CarrelloController {
     @Autowired
     private CarrelloService carrelloService;
 
-
-   // @PostMapping()
+    @PostMapping()
     //@RolesAllowed({"amm","cliente"})
- /*   TODO public ResponseEntity creaOrdine(@RequestBody @Valid Carrello ordine){
+    public ResponseEntity creaOrdine(@RequestBody Carrello carrello,@RequestParam String indirizzo){
         try{
-            Carrello res= carrelloService.(ordine);
+            Ordine res= carrelloService.addOrdine(carrello, indirizzo);
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (RuntimeException e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
-*/
+
     @PutMapping("/addp")
     //@PreAuthorize("hasRole=cliente")
-
-    public Carrello addp(@PathVariable int carrelloId, @PathVariable List<Prodotto> prodotti){
-        return carrelloService.setProdottiCarrello(carrelloId, prodotti);
+    public ResponseEntity addp(@RequestParam int carrelloId, @RequestParam int prodotto){
+        try{
+            Carrello res= carrelloService.addProdottiCarrello(carrelloId, prodotto);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/removep")
     //@PreAuthorize("hasRole=cliente")
-
-    public Carrello removep(@PathVariable int carrelloId, @PathVariable int prodottoId){
-        return carrelloService.removeProdottiCarrello(carrelloId, prodottoId);
+    public ResponseEntity removep(@RequestParam int carrelloId, @RequestParam int prodottoId){
+        try{
+            Carrello res= carrelloService.removeProdottiCarrello(carrelloId, prodottoId);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
-
 
     @GetMapping("/all")
     //@PreAuthorize("hasRole=amm")
-    public List<Carrello> getOrdini(){
-        return carrelloService.getOrdini();
+    public ResponseEntity getOrdini(){
+        try{
+            List<Ordine> res= carrelloService.getOrdini();
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
-
 
     @GetMapping("/cliente")
     //@PreAuthorize("hasRole=all")
-    public List<Carrello> getOrdiniCliente(@PathVariable Cliente cliente){
-        return carrelloService.mostraOrdiniCliente(cliente);
+    public ResponseEntity getOrdiniCliente(@RequestBody Cliente cliente){
+        try{
+            List<Ordine> res= carrelloService.mostraOrdiniCliente(cliente);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
-
 
     @GetMapping("/periodo")
     //@PreAuthorize("hasRole=amm")
-    public List<Carrello> getOrdiniPeriodo(@PathVariable Date start, @PathVariable Date end){
-        return carrelloService.mostraOrdiniPeriodo(start,end);
+    public ResponseEntity getOrdiniPeriodo(@RequestBody Cliente cliente, @RequestParam LocalDateTime start, @RequestParam LocalDateTime end){
+        try{
+            List<Ordine> res= carrelloService.mostraOrdiniPeriodo(cliente,start,end);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
-
 
     @GetMapping("/prodotto")
     //@PreAuthorize("hasRole=amm")
-
-    public List<Carrello> getOrdiniProdotto(@PathVariable Prodotto prodotto){
-        return carrelloService.mostraOrdiniProdotto(prodotto);
+    public ResponseEntity getOrdiniProdotto(@RequestBody Prodotto prodotto){
+        try{
+            List<Ordine> res= carrelloService.mostraOrdiniProdotto(prodotto);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e) {
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/prodotti")
     //@PreAuthorize("hasRole=amm")
+    public ResponseEntity getProdottiOrdine(@RequestBody Carrello carrello){
+        try{
+            List<Prodotto> res= carrelloService.mostraProdottiOrdine(carrello);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
 
-    public List<Prodotto> getProdottiOrdine(@PathVariable Carrello carrello){
-        return carrelloService.mostraProdottiOrdine(carrello);
+
+    }
+
+    @GetMapping("/carrello")
+    //@PreAuthorize("hasRole=all")
+    public ResponseEntity getCarrello(@RequestBody Cliente cliente){
+        try{
+            List<Carrello> res= carrelloService.mostraCarrelloCliente(cliente);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/zona")
+    //@PreAuthorize("hasRole=amm")
+    public ResponseEntity getZona(@RequestParam String città){
+        try{
+            List<Ordine> res= carrelloService.mostraPerZona(città);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/ordine")
+    //@PreAuthorize("hasRole=amm")
+    public ResponseEntity getOrdine(@RequestParam int id){
+        try{
+            Ordine res= carrelloService.getOrdine(id);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (RuntimeException e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 }

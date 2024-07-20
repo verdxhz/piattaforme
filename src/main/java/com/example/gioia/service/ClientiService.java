@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
+//TODO CHIEDERE AD ANDREA COSA SI DEVE GESTIRE DA KEYCLOAK E COSA DA QUI
 @Service
 public class ClientiService {
     @Autowired
@@ -18,32 +18,26 @@ public class ClientiService {
 
     @Transactional
     public Cliente registaCliente(Cliente cliente) {
-        if(clienteRepository.existsByEmail(cliente.getEmail()) || clienteRepository.existsByUsernameIgnoreCase(cliente.getUsername())){
+        if(clienteRepository.existsById(cliente.getId_cliente())){
             throw new RuntimeException();//TODO
         }
-        else if ((Pattern.matches("[a-zA-Z ]+", cliente.getNome()) && //controlla che il nome sia solo lettere
-                Pattern.matches("[a-zA-Z0-9]{1,15}+", cliente.getUsername()) && //controlla che l'username sia lettere ed eventualmente numeri
-                Pattern.matches("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*.-]).{8,}$", cliente.getPassword()) && //Contenga almeno una lettera maiuscola, una lettera minuscola, una cifra, un carattere speciale  sia lunga almeno 8 caratteri.
-                Pattern.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", cliente.getEmail()))){ //controllo abbia la forma di un'email
-        clienteRepository.save(cliente);}
         else
-            throw new RuntimeException();//TODO
+        clienteRepository.save(cliente);
         return cliente;
     }
-    @Transactional
-    public List<Cliente> mostraClienti(){
-        return clienteRepository.findAll();
-    }
 
-    @Transactional
-    public Cliente mostraClientiEmail(String email){
-        return clienteRepository.findByEmail(email);
-    }
-
-    public List<Cliente> mostraClientiNome(String nome){
-        List<Cliente> res= new ArrayList<>();
-         res.addAll(clienteRepository.findByNomeContainingIgnoreCase(nome));
-         return res;
+    @Transactional(readOnly = false)
+    public Cliente updateCliente(Cliente cliente) {//TODO throws Exception {
+        if(clienteRepository.existsById(cliente.getId_cliente())){
+            Optional<Cliente> c= clienteRepository.findById(cliente.getId_cliente());
+            Cliente cc=c.get();
+            cc.setNome(cliente.getNome());
+            cc.setCarrello(cliente.getCarrello());
+            cc.setOrdini(cliente.getOrdini());
+            clienteRepository.save(cliente);
+                }
+        //TODO throw new UserNotFoundException();
+        return null;
     }
 
     @Transactional(readOnly = false)
@@ -53,25 +47,21 @@ public class ClientiService {
             if (cli.isPresent()) clienteRepository.delete(cli.get());
         }
     }
-    @Transactional(readOnly = false)
-    public Cliente updateCliente(Cliente utente) {//TODO throws Exception {
-        for (Cliente u : mostraClienti()) {
-            if (utente.getUsername().equals(u.getUsername()) || utente.getEmail().equals(u.getEmail())) {
-                if ((Pattern.matches("[a-zA-Z ]+", utente.getNome()) &&
-                        Pattern.matches("[a-zA-Z0-9]{1,15}+", utente.getUsername()) &&
-                        Pattern.matches("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*.-]).{8,}$", utente.getPassword()) &&
-                        Pattern.matches("[a-zA-Z0-9]+@[a-zA-Z]+.[a-zA-Z]{2,3}", utente.getEmail())
-                )) {
-                    clienteRepository.save(utente);
-                } else {
-                    //TODO throw new InvalidCredentials("Invalid credentials");
-                }
-                return utente;
-            }
-        }
-        //TODO throw new UserNotFoundException();
-        return null;
+
+    @Transactional(readOnly = true)
+    public List<Cliente> mostraClienti(){
+        List<Cliente> res= new ArrayList<>();
+        res.addAll(clienteRepository.findAll());
+        return res;
     }
+
+    @Transactional(readOnly = true)
+    public List<Cliente> mostraClientiNome(String nome){
+        List<Cliente> res= new ArrayList<>();
+        res.addAll(clienteRepository.findByNomeContainingIgnoreCase(nome));
+        return res;
+    }
+
     //TODO keycloack
 
 }

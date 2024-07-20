@@ -1,11 +1,9 @@
 package com.example.gioia.service;
 
-import com.example.gioia.entity.Carrello;
-import com.example.gioia.entity.Cliente;
+import com.example.gioia.entity.*;
 
-import com.example.gioia.entity.Prodotti_Carrello;
-import com.example.gioia.entity.Prodotto;
 import com.example.gioia.repositories.CarrelloRepository;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +13,19 @@ import com.example.gioia.repositories.ClienteRepository;
 import com.example.gioia.repositories.Prodotti_Carrello_Repository;
 
 import com.example.gioia.repositories.ProdottoRepository;
+import com.example.gioia.repositories.OrdineRepository;
+
+
+import java.time.LocalDateTime;
 
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
-import java.util.Optional;
+
 
 
 @Service
 public class CarrelloService {
-
 
     @Autowired
     ClienteRepository clienteRepository;
@@ -33,29 +34,25 @@ public class CarrelloService {
     @Autowired
     CarrelloRepository carrelloRepository;
     @Autowired
+    OrdineRepository ordineRepository;
+    @Autowired
     ProdottoRepository prodottoRepository;
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
     private Prodotti_Carrello_Repository prodotti_Carrello_Repository;
-
-
-    //TODO add carrello ordine
-
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
+    //carrello
+    @Transactional(readOnly = false)
     public Carrello removeProdottiCarrello(int carrelloId, int prodId){ //throws QuantityBelowZeroException, NoProductException {
-        Carrello optionalCarrello = carrelloRepository.findById(carrelloId);
-        Carrello carrello = optionalCarrello;
-        Optional<Prodotto> Prodotto = prodottoRepository.findById(prodId);
-        if (Prodotto.isPresent()) {
-            Prodotto prodotto = Prodotto.get();
-            Prodotti_Carrello prodInCarr = prodotti_Carrello_Repository.findByCarrelloAndProdotto(carrello, prodotto);
+        if (!carrelloRepository.existsById(carrelloId) || !prodottoRepository.existsById(prodId))
+        {//TODO eccezione
+            return null; }
+        Carrello carrello = carrelloRepository.findById(carrelloId);
+        Prodotto prodotto = prodottoRepository.findById(prodId).get();
+        Prodotti_Carrello prodInCarr = prodotti_Carrello_Repository.findByCarrelloAndProdotto(carrello, prodotto);
             if (prodInCarr != null) {
                 // Aggiorna la quantità nel carrello
                 int newQuantity = prodInCarr.getQuantità() - 1;
-                if (newQuantity < 0) {
-                    //TODO throw new QuantityBelowZeroException("stai cercando di togliere "+quantity+" biglietti per "+prodotto.getName()+" ma ci sono solo "+prodInCarr.getQuantity()+" biglietti rimasti");
-                }
                 if (newQuantity == 0) {
                     prodotti_Carrello_Repository.delete(prodInCarr);
                 } else {
@@ -68,85 +65,98 @@ public class CarrelloService {
             } else {
                 // TODO throw new NoProductException("Il prodotto non è presente nel carrello");
             }
-        } else {
-            //TODO throw new NoProductException("Prodotto non trovato con ID: " + prodId);
-        }
         return carrello;
     }
 
-
-    @Transactional(readOnly = false, rollbackFor = Exception.class)
-    public Carrello setProdottiCarrello(int carrelloId, List<Prodotto> prodotti){//TODO throws QuantityBelowZeroException, PriceChangedException {
+    @Transactional(readOnly = false)
+    public Carrello addProdottiCarrello(int carrelloId, int prodId){//TODO throws QuantityBelowZeroException, PriceChangedException {
+        if (!carrelloRepository.existsById(carrelloId) || !prodottoRepository.existsById(prodId))
+        {//TODO eccezione
+            return null; }
         Carrello carrello = carrelloRepository.findById(carrelloId);
-
-        Cliente utente = carrello.getCliente();
-        // Controlla se ci sono prodotti nel carrello con prezzo cambiato
-        for (Prodotto p : prodotti) {
-            if (p.getPrezzo() != prodottoRepository.findById(p.getId()).orElseThrow().getPrezzo()) {
-                //TODO throw new PriceChangedException(p.getName() + "'s price changed from " + p.getPrice() + " euro to " + prodRepository.findById(p.getId()).orElseThrow().getPrice() + " euro.");
-            }
+        Prodotto prodotto = prodottoRepository.findById(prodId).get();
+        Prodotti_Carrello prodInCarr = prodotti_Carrello_Repository.findByCarrelloAndProdotto(carrello, prodotto);
+        if (prodInCarr != null) {
+            prodInCarr= new Prodotti_Carrello();
+            prodInCarr.setCarrello(carrello);
+            prodInCarr.setProdotto(prodotto);
+            prodInCarr.setQuantità(1);
+            prodotti_Carrello_Repository.save(prodInCarr);
         }
-        // Aggiorna i prodotti nel carrello
-        for (Prodotto p : prodotti) {
-            Optional<Prodotto> optionalProdotto = prodottoRepository.findById(p.getId());
-            if (optionalProdotto.isPresent()) {
-                Prodotto prodotto = optionalProdotto.get();
-                Prodotti_Carrello prodInCarr = Prodotti_Carrello_repository.findByCarrelloAndProdotto(carrello, prodotto);
-                if (prodInCarr != null) {
-                    // Aggiorna la quantità del prodotto nel carrello
-                    if (prodotto.getDisponibilità() - 1< 0) {
-                        //TODO throw new QuantityBelowZeroException("We are sorry: only " + prodotto.getQuantity() + " ticket(s) left for " + prodotto.getName());
-                    }
-                    prodInCarr.setQuantità(prodInCarr.getQuantità() + 1);
-                    prodotti_Carrello_Repository.save(prodInCarr);
-                    // Aggiorna la quantità disponibile del prodotto
-                    prodotto.setDisponibilità(prodotto.getDisponibilità() - 1);
-                    prodottoRepository.save(prodotto);
-                } else {
-                    // Aggiungi il prodotto al carrello
-                    if (p.getDisponibilità() > 0) {
-                        int newQuantity = prodotto.getDisponibilità() - 1;
-                        if (newQuantity < 0) {
-                           //TODO throw new QuantityBelowZeroException("We are sorry: only " + prodotto.getQuantity() + " ticket(s) left for " + prodotto.getName());
-                        }
-                        Prodotti_Carrello newProdInCarr = new Prodotti_Carrello();
-                        newProdInCarr.setCarrello(carrello);
-                        newProdInCarr.setProdotto(prodotto);
-                        newProdInCarr.setQuantità(1);
-                        prodotti_Carrello_Repository.save(newProdInCarr);
-                        // Aggiorna la quantità disponibile del prodotto
-                        prodotto.setDisponibilità(newQuantity);
-                        prodottoRepository.save(prodotto);
-                    }
-                }
-            }
+        else{
+            prodInCarr.setQuantità(prodInCarr.getQuantità()+1);
+            prodotti_Carrello_Repository.save(prodInCarr);
         }
+        if(prodotto.getDisponibilità()==0){//TODO eccezione
+            return null;
+        }
+        prodotto.setDisponibilità(prodotto.getDisponibilità()-1);
+        prodottoRepository.save(prodotto);
+        List<Prodotti_Carrello> prod= new ArrayList<>(carrello.getProdotti());
+        prod.add(prodInCarr);
+        carrello.setProdotti(prod);
+        carrelloRepository.save(carrello);
         return carrello;
-    }
-
-
-
-
-
+    }//TODO far vedere andrea
 
     @Transactional(readOnly = true)
-    public List<Carrello> mostraOrdiniCliente(Cliente cliente){
+    public List<Carrello> mostraCarrelloCliente(Cliente cliente){
         if(!clienteRepository.existsById(cliente.getId_cliente()))
             throw new RuntimeException();//TODO
-        return carrelloRepository.findByclient(cliente.getId_cliente());
+        List<Carrello> res=new ArrayList<>(carrelloRepository.findByclient(cliente.getId_cliente()));
+        return res;
     }
+
+    //ordini
+    @Transactional(readOnly = false)
+    public Ordine addOrdine(Carrello carrello, String indirizzo){
+        if (!carrelloRepository.existsById(carrello.getId()))
+        {//TODO eccezione
+            return null; }
+        Ordine ordine= new Ordine();
+        ordine.setCarrello(carrello);
+        ordine.setData(LocalDateTime.now());
+        ordine.setIndirizzo(indirizzo);
+        ordineRepository.save(ordine);
+        carrello.setProdotti(new ArrayList<>());
+        carrelloRepository.save(carrello);
+        return ordine;
+    }
+
     @Transactional(readOnly = true)
-    public List<Carrello> mostraOrdiniPeriodo(Date start, Date end){
+    public List<Ordine> mostraOrdiniCliente(Cliente cliente){
+        if(!clienteRepository.existsById(cliente.getId_cliente()))
+            throw new RuntimeException();//TODO
+        List<Ordine> res=new ArrayList<>(ordineRepository.findByclient(cliente.getId_cliente()));
+        return res;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Ordine> mostraOrdiniPeriodo(Cliente cliente, LocalDateTime start, LocalDateTime end){
         if(start.compareTo(end) >= 0)
-            throw new RuntimeException();
-        return carrelloRepository.findByIntervalloTempo(start,end);
+            throw new RuntimeException();//TODO
+        List<Ordine> res = new ArrayList<>();
+        if(cliente == null){
+            for (Cliente c: clienteRepository.findAll())
+                res.addAll(ordineRepository.findByIntervalloTempo(cliente.getId_cliente(),start,end));
+            return res;
+        }
+        else{
+            if(!clienteRepository.existsById(cliente.getId_cliente()))
+                throw new RuntimeException();//TODO
+             res=ordineRepository.findByIntervalloTempo(cliente.getId_cliente(),start,end);
+             return res;
+        }
     }
+
     @Transactional(readOnly = true)
-    public List<Carrello> mostraOrdiniProdotto(Prodotto prodotto){
+    public List<Ordine> mostraOrdiniProdotto(Prodotto prodotto){
         if(!prodottoRepository.existsById(prodotto.getId()))
             throw new RuntimeException();
-        return Prodotti_Carrello_repository.findByProdotto(prodotto);
+        List<Ordine> res=new ArrayList<>(ordineRepository.findByProdotto(prodotto));
+        return res;
     }
+
     @Transactional(readOnly = true)
     public List<Prodotto> mostraProdottiOrdine(Carrello carrello){
         if(!carrelloRepository.existsById(carrello.getId()))
@@ -155,12 +165,25 @@ public class CarrelloService {
         for (Prodotti_Carrello p : carrello.getProdotti())
             res.add(p.getProdotto());
         return res;
-
-
     }
+
     @Transactional(readOnly = true)
-    public List<Carrello> getOrdini() {
-        return carrelloRepository.findAll();
+    public List<Ordine> mostraPerZona(String città){
+        List<Ordine> res=new ArrayList<>(ordineRepository.findByCitta(città));
+        return res;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Ordine> getOrdini(){
+        List<Ordine> res=new ArrayList<>(ordineRepository.findAll());
+        return res;
+    }
+
+    @Transactional(readOnly = true)
+    public Ordine getOrdine(int id) {
+        return ordineRepository.findById(id);
     }
 
 }
+
+
