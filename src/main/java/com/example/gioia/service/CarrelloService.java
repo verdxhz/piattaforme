@@ -118,8 +118,12 @@ public class CarrelloService {
         ordine.setData(LocalDateTime.now());
         ordine.setIndirizzo(indirizzo);
         ordineRepository.save(ordine);
-        carrello.setProdotti(new ArrayList<>());
-        carrelloRepository.save(carrello);
+        Cliente cliente= carrello.getCliente();
+        cliente.setCarrello(new Carrello());
+        List<Ordine> ordini= cliente.getOrdini();
+        ordini.add(ordine);
+        cliente.setOrdini(ordini);
+        clienteRepository.save(cliente);
         return ordine;
     }
 

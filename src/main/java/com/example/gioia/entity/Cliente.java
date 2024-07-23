@@ -27,7 +27,7 @@ public class Cliente {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @OneToMany(mappedBy ="cliente", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy ="cliente", cascade = CascadeType.MERGE)//todo
     @JsonIgnore
     @ToString.Exclude
     private List<Ordine> ordini ;

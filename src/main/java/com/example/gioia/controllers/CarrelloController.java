@@ -8,10 +8,8 @@ import com.example.gioia.service.CarrelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +20,7 @@ public class CarrelloController {
     private CarrelloService carrelloService;
 
     @PostMapping()
-    //@RolesAllowed({"amm","cliente"})
+    @PreAuthorize("hasRole('utente')")
     public ResponseEntity creaOrdine(@RequestBody Carrello carrello,@RequestParam String indirizzo){
         try{
             Ordine res= carrelloService.addOrdine(carrello, indirizzo);
@@ -33,7 +31,7 @@ public class CarrelloController {
     }
 
     @PutMapping("/addp")
-    //@PreAuthorize("hasRole=cliente")
+    @PreAuthorize("hasRole('utente')")
     public ResponseEntity addp(@RequestParam int carrelloId, @RequestParam int prodotto){
         try{
             Carrello res= carrelloService.addProdottiCarrello(carrelloId, prodotto);
@@ -44,7 +42,7 @@ public class CarrelloController {
     }
 
     @PutMapping("/removep")
-    //@PreAuthorize("hasRole=cliente")
+    @PreAuthorize("hasRole('utente')")
     public ResponseEntity removep(@RequestParam int carrelloId, @RequestParam int prodottoId){
         try{
             Carrello res= carrelloService.removeProdottiCarrello(carrelloId, prodottoId);
@@ -55,7 +53,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/all")
-    //@PreAuthorize("hasRole=amm")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity getOrdini(){
         try{
             List<Ordine> res= carrelloService.getOrdini();
@@ -66,7 +64,6 @@ public class CarrelloController {
     }
 
     @GetMapping("/cliente")
-    //@PreAuthorize("hasRole=all")
     public ResponseEntity getOrdiniCliente(@RequestBody Cliente cliente){
         try{
             List<Ordine> res= carrelloService.mostraOrdiniCliente(cliente);
@@ -77,7 +74,6 @@ public class CarrelloController {
     }
 
     @GetMapping("/periodo")
-    //@PreAuthorize("hasRole=amm")
     public ResponseEntity getOrdiniPeriodo(@RequestBody Cliente cliente, @RequestParam LocalDateTime start, @RequestParam LocalDateTime end){
         try{
             List<Ordine> res= carrelloService.mostraOrdiniPeriodo(cliente,start,end);
@@ -88,7 +84,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/prodotto")
-    //@PreAuthorize("hasRole=amm")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity getOrdiniProdotto(@RequestBody Prodotto prodotto){
         try{
             List<Ordine> res= carrelloService.mostraOrdiniProdotto(prodotto);
@@ -99,7 +95,6 @@ public class CarrelloController {
     }
 
     @GetMapping("/prodotti")
-    //@PreAuthorize("hasRole=amm")
     public ResponseEntity getProdottiOrdine(@RequestBody Carrello carrello){
         try{
             List<Prodotto> res= carrelloService.mostraProdottiOrdine(carrello);
@@ -112,7 +107,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/carrello")
-    //@PreAuthorize("hasRole=all")
+    @PreAuthorize("hasRole('utente')")
     public ResponseEntity getCarrello(@RequestBody Cliente cliente){
         try{
             List<Carrello> res= carrelloService.mostraCarrelloCliente(cliente);
@@ -123,7 +118,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/zona")
-    //@PreAuthorize("hasRole=amm")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity getZona(@RequestParam String città){
         try{
             List<Ordine> res= carrelloService.mostraPerZona(città);
@@ -134,7 +129,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/ordine")
-    //@PreAuthorize("hasRole=amm")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity getOrdine(@RequestParam int id){
         try{
             Ordine res= carrelloService.getOrdine(id);

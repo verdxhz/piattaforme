@@ -1,11 +1,10 @@
 package com.example.gioia.controllers;
 
 import com.example.gioia.entity.Prodotto;
-import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.gioia.service.ProdottiService;
@@ -18,8 +17,8 @@ public class ProdottiController {
     @Autowired
     private ProdottiService prodottiService;
 
-    @PostMapping()
-    //@PreAuthorize("hasRole=amm")
+    @PostMapping("/crea")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity creaProdotto(@RequestBody Prodotto prodotto) {
         try{
             Prodotto res= prodottiService.addProdotto(prodotto);
@@ -30,7 +29,7 @@ public class ProdottiController {
     }
 
     @DeleteMapping("/delete")
-   // @PreAuthorize("hasRole=amm")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity rimuoviProdotto(@RequestBody Prodotto prodotto) {
         try{
             prodottiService.removeProduct(prodotto);
@@ -41,7 +40,7 @@ public class ProdottiController {
     }
 
     @PutMapping("/update")
-    //@PreAuthorize("hasRole=amm")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity aggiornaProdotto(@RequestBody Prodotto prodotto) {
         try{
             Prodotto res= prodottiService.updateProduct(prodotto);
@@ -52,7 +51,7 @@ public class ProdottiController {
     }
 
     @GetMapping("/one")
-    //@PreAuthorize("hasRole=all")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity getProductByID(@RequestParam int id) {
         try{
             Prodotto res= prodottiService.getProdotto(id);
@@ -63,13 +62,11 @@ public class ProdottiController {
     }
 
     @GetMapping("/all")
-    //@PreAuthorize("hasRole=all")
     public List<Prodotto> getProdotti(@RequestParam(required = false, defaultValue = "0")int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag, @RequestParam String ordine) {
         return prodottiService.mostraProdotti(numPag,dimPag,ordine);
     }
 
     @GetMapping("/nome")
-    //@PreAuthorize("hasRole=all")
     public ResponseEntity getProdottiNome(@RequestParam String nome,@RequestParam int numPag, @RequestParam int dimPag) {
         try{
             List<Prodotto> res= prodottiService.mostraProdottiNome(nome,numPag,dimPag);
@@ -80,7 +77,6 @@ public class ProdottiController {
     }
 
     @GetMapping("/categoria")
-    //@PreAuthorize("hasRole=all")
     public ResponseEntity getProdottiCategoria(@RequestParam String categoria,@RequestParam int numPag, @RequestParam int dimPag, @RequestParam String ordine) {
         try{
             List<Prodotto> res= prodottiService.mostraProdottiCategoria(categoria,numPag,dimPag,ordine);
@@ -91,7 +87,6 @@ public class ProdottiController {
     }
 
     @GetMapping("/prezzo")
-    //@PreAuthorize("hasRole=all")
     public ResponseEntity getProdottiPrezzo(@RequestParam int min, @RequestParam int max,@RequestParam int numPag, @RequestParam int dimPag, @RequestParam String ordine) {
         try{
             List<Prodotto> res= prodottiService.mostraProdottiPrezzo(min, max,numPag,dimPag,ordine);
@@ -102,7 +97,7 @@ public class ProdottiController {
     }
 
     @GetMapping("/terminati")
-    //PreAuthorize("hasRole=amm")
+    @PreAuthorize("hasRole('admin')")
     public ResponseEntity getTerminati(){
         try{
             List<Prodotto> res= prodottiService.getProdottiTerminati();
