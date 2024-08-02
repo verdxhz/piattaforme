@@ -14,8 +14,8 @@ import java.util.List;
 public interface CarrelloRepository extends JpaRepository<Carrello, Integer> {
     //ricerca semplice
     public Carrello findById(int id);
-    @Query("select o from Carrello o where o.cliente.id_cliente=?1")
-    public List<Carrello> findByclient(int client);
+    @Query("select c.carrello from Cliente c where c.id_cliente=?1")
+    public Carrello findByclient(int client);
 
     //verifica esistenza
     boolean existsById(int id);

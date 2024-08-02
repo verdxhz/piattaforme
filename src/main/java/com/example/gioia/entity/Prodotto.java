@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Getter
@@ -46,12 +47,18 @@ public class Prodotto {
     @Column(name = "immagine", nullable = false)
     private String immagine;
 
-
-
     @OneToMany(mappedBy = "prodotto")
     @JsonIgnore
     @ToString.Exclude
-    private List<Prodotti_Carrello> prodotti;
+    private List<Prodotti_Carrello> carrelli;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Prodotto prodotto = (Prodotto) o;
+        return id == prodotto.id && Float.compare(prezzo, prodotto.prezzo) == 0 && Objects.equals(nome, prodotto.nome) && Objects.equals(descrizione, prodotto.descrizione) && Objects.equals(categoria, prodotto.categoria);
+    }
 
 }
 

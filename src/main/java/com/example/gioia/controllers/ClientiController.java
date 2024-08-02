@@ -1,5 +1,7 @@
 package com.example.gioia.controllers;
 
+import com.example.gioia.eccezioni.UtenteEsistente;
+import com.example.gioia.eccezioni.UtenteNonTrovato;
 import com.example.gioia.entity.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,27 +24,27 @@ public class ClientiController {
         try{
             Cliente res = clientiService.registaCliente(cliente);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch(Exception e){
+        }catch(UtenteEsistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/update")
-    public ResponseEntity update(@RequestParam Cliente cliente){
+    public ResponseEntity update(@RequestBody Cliente cliente) {
         try{
             Cliente res = clientiService.updateCliente(cliente);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch(Exception e){
+        }catch(UtenteNonTrovato e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @DeleteMapping("/update")
-    public ResponseEntity delete(@RequestParam Cliente cliente){
+    @DeleteMapping("/delete")
+    public ResponseEntity delete(@RequestBody Cliente cliente){
         try{
             clientiService.removeCliente(cliente);
             return new ResponseEntity(cliente, HttpStatus.OK);
-        }catch(Exception e){
+        }catch(UtenteNonTrovato  e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -53,7 +55,7 @@ public class ClientiController {
         try{
             List<Cliente> res = clientiService.mostraClienti();
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch(Exception e){
+        }catch(UtenteNonTrovato e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -64,7 +66,7 @@ public class ClientiController {
         try{
             List<Cliente> res = clientiService.mostraClientiNome(nome);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch(Exception e){
+        }catch( UtenteNonTrovato e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }

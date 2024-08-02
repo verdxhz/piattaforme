@@ -1,5 +1,7 @@
 package com.example.gioia.service;
 
+import com.example.gioia.eccezioni.IntervalloErrato;
+import com.example.gioia.eccezioni.ProdottoInesistente;
 import com.example.gioia.entity.Prodotto;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,7 @@ import org.springframework.stereotype.Service;
 import com.example.gioia.repositories.ProdottoRepository;
 
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProdottiService {
@@ -20,9 +21,11 @@ public class ProdottiService {
     private ProdottoRepository prodottoRepository;
     //base
     @Transactional(readOnly = false)
-    public Prodotto addProdotto(Prodotto prodotto) {
+    public Prodotto addProdotto(Prodotto prodotto) throws ProdottoInesistente {
         if(prodottoRepository.existsById(prodotto.getId())){
           Optional<Prodotto> p=prodottoRepository.findById(prodotto.getId());
+          if (!p.get().equals(prodotto))
+              throw new ProdottoInesistente("il prodotto ha dei valori errati");
             p.get().setDisponibilità((prodotto.getDisponibilità() + prodotto.getDisponibilità()));
             return p.get();
         }
@@ -31,16 +34,17 @@ public class ProdottiService {
     }
 
     @Transactional(readOnly = false)
-    public void removeProduct(Prodotto prodotto) {  // throws NoProductException {
+    public void removeProduct(Prodotto prodotto) throws ProdottoInesistente {
         if (prodottoRepository.existsById(prodotto.getId())) {
             Optional<Prodotto> p = prodottoRepository.findById(prodotto.getId());
             prodottoRepository.delete(p.get());
         }
-        //TODO else throw new NoProductException();
+        else
+            throw new ProdottoInesistente("il prodotto che vuoi rimuovere non esiste");
     }
 
     @Transactional(readOnly = false)
-    public Prodotto updateProduct(Prodotto prodotto){// throws NoProductException {
+    public Prodotto updateProduct(Prodotto prodotto) throws ProdottoInesistente {
         if(prodottoRepository.existsById(prodotto.getId())){
             Optional<Prodotto> p=prodottoRepository.findById(prodotto.getId());
             Prodotto pp = p.get();
@@ -52,73 +56,81 @@ public class ProdottiService {
             // Salva l'entity aggiornata nel database
             return prodottoRepository.save(pp);
         } else {
-            //TODO throw new NoProductException("Prodotto non trovato");
-            return null;//TODO rmuovi riga e metti eccezione
+            throw new ProdottoInesistente("il prodotto che vuoi aggiornare non esiste");
         }
     }
     //utili
     @Transactional(readOnly = true)
-    public List<Prodotto> mostraProdotti(int numPag, int dimPag, String ordine){
+    public List<Prodotto> mostraProdotti(int numPag, int dimPag, String ordine) throws ProdottoInesistente {
         Pageable p= PageRequest.of(numPag,dimPag, Sort.by(ordine));
         Page<Prodotto> res= prodottoRepository.findAll(p);
         if(res.hasContent()){
             return res.getContent();
         }
-        //TODO controlla ci siano prodotti nel database
-        return null;
+        throw new ProdottoInesistente("non ci sono prodotti da visualizzare");
+
     }
 
     @Transactional(readOnly = true)
-    public List<Prodotto> mostraProdottiPrezzo(int min, int max,int numPag, int dimPag, String ordine){
+    public List<Prodotto> mostraProdottiPrezzo(int min, int max,int numPag, int dimPag, String ordine) throws IntervalloErrato, ProdottoInesistente {
         if(min>max)
-            //TODO
-            return null;
-        Pageable p= PageRequest.of(numPag,dimPag, Sort.by(ordine));
-        Page<Prodotto> res= prodottoRepository.findByIntervalloPrezzo(min, max, p);
-        if(res.hasContent()){
-            return res.getContent();
+            throw new IntervalloErrato("il prezzo minimo deve essere minore del massimo");
+        else {
+            Pageable p = PageRequest.of(numPag, dimPag, Sort.by(ordine));
+            Page<Prodotto> res = prodottoRepository.findByIntervalloPrezzo(min, max, p);
+            if (res.hasContent()) {
+                return res.getContent();
+            }
+            else
+                throw new ProdottoInesistente("nessun prodotto trovato");
         }
-        //TOdO nulla rientra in questa fascia, controlla che min sia minore di max
-        return null;
     }
 
     @Transactional(readOnly = true)
-    public List<Prodotto> mostraProdottiCategoria(String categoria, int numPag, int dimPag, String ordine){
+    public List<Prodotto> mostraProdottiCategoria(String categoria, int numPag, int dimPag, String ordine) throws ProdottoInesistente {
         Pageable p= PageRequest.of(numPag,dimPag, Sort.by(ordine));
         Page<Prodotto> res= prodottoRepository.findByCategoria(categoria,p);
         if(res.hasContent()){
             return res.getContent();
         }
-        //TODO La categoria è vuota
-        return null;
+        else
+            throw new ProdottoInesistente("nessun prodotto trovato");
     }
 
     @Transactional(readOnly = true)
-    public List<Prodotto> mostraProdottiNome(String nome,int numPag, int dimPag){
-        Pageable p= PageRequest.of(numPag,dimPag);
-        Page<Prodotto> res= prodottoRepository.findByParole(nome,p);
-        if(res.hasContent()){
-            return res.getContent();
+    public List<Prodotto> mostraProdottiNome(String nome, int numPag, int dimPag) throws ProdottoInesistente {
+        Pageable pageable = PageRequest.of(numPag, dimPag);
+        Page<Prodotto> paginaRisultato = prodottoRepository.findByParole(nome, pageable);
+        Set<Prodotto> contenutoCombinato = new HashSet<>(paginaRisultato.getContent());
+        List<String> listaParole = Arrays.asList(nome.split("\\s+"));
+        for (String parola : listaParole) {
+            Page<Prodotto> paginaParziale = prodottoRepository.findByParole(parola, pageable);
+            if (paginaParziale.hasContent()) {
+                contenutoCombinato.addAll(paginaParziale.getContent());
+            }
         }
-        return null;//TODO nessun prodotto si chiama così, List<String> paroleList = Arrays.asList(parole.split("\\s+"));
+        if (!contenutoCombinato.isEmpty()) {
+            return new ArrayList<>(contenutoCombinato);
+        } else {
+            throw new ProdottoInesistente("nessun prodotto trovato");
+        }
     }
 
     @Transactional(readOnly = true)
-    public Prodotto getProdotto(int id){// throws NoProductException {
+    public Prodotto getProdotto(int id) throws ProdottoInesistente {
         Optional<Prodotto> p = prodottoRepository.findById(id);
         if (p.isPresent())
             return p.get();
-        else{return null;}
-           //TODO throw new NoProductException("prodotto inesistente");
+        else{throw new ProdottoInesistente("il prodotto non esiste");}
     }
 
     @Transactional(readOnly = true)
-    public List<Prodotto> getProdottiTerminati(){// throws NoProductException {
+    public List<Prodotto> getProdottiTerminati() throws ProdottoInesistente {
         List<Prodotto> p= prodottoRepository.findByDisponibilità(0);
         if (!p.isEmpty())
             return p;
-        else{return null;}
-        //TODO tutti sono disponibili;
+        else{ throw new ProdottoInesistente("nessun prodotto terminato");}
+
     }
 
 

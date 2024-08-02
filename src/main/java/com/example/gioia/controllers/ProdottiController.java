@@ -1,5 +1,7 @@
 package com.example.gioia.controllers;
 
+import com.example.gioia.eccezioni.IntervalloErrato;
+import com.example.gioia.eccezioni.ProdottoInesistente;
 import com.example.gioia.entity.Prodotto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,7 @@ public class ProdottiController {
         try{
             Prodotto res= prodottiService.addProdotto(prodotto);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -34,7 +36,7 @@ public class ProdottiController {
         try{
             prodottiService.removeProduct(prodotto);
             return new ResponseEntity(HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -45,7 +47,7 @@ public class ProdottiController {
         try{
             Prodotto res= prodottiService.updateProduct(prodotto);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -56,42 +58,47 @@ public class ProdottiController {
         try{
             Prodotto res= prodottiService.getProdotto(id);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/all")
-    public List<Prodotto> getProdotti(@RequestParam(required = false, defaultValue = "0")int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag, @RequestParam String ordine) {
-        return prodottiService.mostraProdotti(numPag,dimPag,ordine);
+    public ResponseEntity getProdotti(@RequestParam(required = false, defaultValue = "0")int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag, @RequestParam(required = false, defaultValue = "id") String ordine) {
+        try{
+            List<Prodotto> res= prodottiService.mostraProdotti(numPag,dimPag,ordine);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (ProdottoInesistente e){
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/nome")
-    public ResponseEntity getProdottiNome(@RequestParam String nome,@RequestParam int numPag, @RequestParam int dimPag) {
+    public ResponseEntity getProdottiNome(@RequestParam String nome,@RequestParam(required = false, defaultValue = "0") int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag) {
         try{
             List<Prodotto> res= prodottiService.mostraProdottiNome(nome,numPag,dimPag);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/categoria")
-    public ResponseEntity getProdottiCategoria(@RequestParam String categoria,@RequestParam int numPag, @RequestParam int dimPag, @RequestParam String ordine) {
+    public ResponseEntity getProdottiCategoria(@RequestParam String categoria,@RequestParam(required = false, defaultValue = "0") int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag, @RequestParam(required = false, defaultValue = "nome") String ordine) {
         try{
             List<Prodotto> res= prodottiService.mostraProdottiCategoria(categoria,numPag,dimPag,ordine);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/prezzo")
-    public ResponseEntity getProdottiPrezzo(@RequestParam int min, @RequestParam int max,@RequestParam int numPag, @RequestParam int dimPag, @RequestParam String ordine) {
+    public ResponseEntity getProdottiPrezzo(@RequestParam int min, @RequestParam int max,@RequestParam(required = false, defaultValue = "0") int numPag, @RequestParam(required = false, defaultValue = "25") int dimPag, @RequestParam(required = false, defaultValue = "nome") String ordine) {
         try{
             List<Prodotto> res= prodottiService.mostraProdottiPrezzo(min, max,numPag,dimPag,ordine);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (IntervalloErrato | ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -102,7 +109,7 @@ public class ProdottiController {
         try{
             List<Prodotto> res= prodottiService.getProdottiTerminati();
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch (RuntimeException e){
+        }catch (ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }

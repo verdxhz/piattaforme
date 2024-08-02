@@ -17,7 +17,7 @@ import java.util.List;
 public interface OrdineRepository extends JpaRepository<Ordine, Integer> {
     //ricerca semplice
     public Ordine findById(int id);
-    @Query("select o from Ordine o where o.carrello.cliente=?1")
+    @Query("select o from Ordine o where o.carrello.cliente.id_cliente=?1")
     public List<Ordine> findByclient(int client);
 
     //ricerca più complessa
@@ -25,8 +25,8 @@ public interface OrdineRepository extends JpaRepository<Ordine, Integer> {
     public List<Ordine> findByIntervalloTempo(int client, LocalDateTime inizio, LocalDateTime fine);
     @Query("select o from Ordine o where o.carrello in  (select p.carrello from Prodotti_Carrello p where p.prodotto= ?1)  ")
     public List<Ordine> findByProdotto(Prodotto prodotto);
-    @Query("select o from Ordine o where o.indirizzo like lower(concat('%', ?1, '%'))")
-    int findByCitta(String città);
+    @Query("select o from Ordine o where lower(o.indirizzo) like lower(concat('%', ?1, '%'))")
+    public List<Ordine> findByCitta(String città);
     //verifica esistenza
     boolean existsByCliente(Cliente cliente);
 

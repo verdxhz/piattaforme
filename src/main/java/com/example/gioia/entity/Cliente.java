@@ -27,13 +27,14 @@ public class Cliente {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @OneToMany(mappedBy ="cliente", cascade = CascadeType.MERGE)//todo
+    @OneToMany(mappedBy ="cliente", cascade = CascadeType.ALL)
     @JsonIgnore
     @ToString.Exclude
     private List<Ordine> ordini ;
 
     @OneToOne
     @JsonIgnore
+    @ToString.Exclude
     private Carrello carrello;
 
 

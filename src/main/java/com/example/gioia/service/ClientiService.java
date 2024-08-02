@@ -1,5 +1,8 @@
 package com.example.gioia.service;
 
+import com.example.gioia.eccezioni.UtenteEsistente;
+import com.example.gioia.eccezioni.UtenteNonTrovato;
+import com.example.gioia.entity.Carrello;
 import com.example.gioia.entity.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,24 +13,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-//TODO CHIEDERE AD ANDREA COSA SI DEVE GESTIRE DA KEYCLOAK E COSA DA QUI
+
 @Service
 public class ClientiService {
     @Autowired
     private ClienteRepository clienteRepository;
 
     @Transactional
-    public Cliente registaCliente(Cliente cliente) {
+    public Cliente registaCliente(Cliente cliente) throws UtenteEsistente {
         if(clienteRepository.existsById(cliente.getId_cliente())){
-            throw new RuntimeException();//TODO
+            throw new UtenteEsistente("l'utente esiste già");
         }
-        else
-        clienteRepository.save(cliente);
-        return cliente;
+        else {
+            //cliente.setCarrello(new Carrello());
+            clienteRepository.save(cliente);
+            return cliente;
+        }
     }
 
     @Transactional(readOnly = false)
-    public Cliente updateCliente(Cliente cliente) {//TODO throws Exception {
+    public Cliente updateCliente(Cliente cliente) throws UtenteNonTrovato {
         if(clienteRepository.existsById(cliente.getId_cliente())){
             Optional<Cliente> c= clienteRepository.findById(cliente.getId_cliente());
             Cliente cc=c.get();
@@ -35,31 +40,41 @@ public class ClientiService {
             cc.setCarrello(cliente.getCarrello());
             cc.setOrdini(cliente.getOrdini());
             clienteRepository.save(cliente);
+            return cliente;
                 }
-        //TODO throw new UserNotFoundException();
-        return null;
+        else
+            throw new UtenteNonTrovato("l'utente che vuoi aggiornare non esiste");
     }
 
     @Transactional(readOnly = false)
-    public void removeCliente(Cliente cliente) {
+    public void removeCliente(Cliente cliente) throws UtenteNonTrovato {
         if (clienteRepository.existsById(cliente.getId_cliente())) {
             Optional<Cliente> cli = clienteRepository.findById(cliente.getId_cliente());
-            if (cli.isPresent()) clienteRepository.delete(cli.get());
+            clienteRepository.delete(cli.get());
         }
+        else
+            throw new UtenteNonTrovato("l'utente che vuoi eliminare non esiste");
+
     }
 
     @Transactional(readOnly = true)
-    public List<Cliente> mostraClienti(){
+    public List<Cliente> mostraClienti() throws UtenteNonTrovato {
         List<Cliente> res= new ArrayList<>();
         res.addAll(clienteRepository.findAll());
-        return res;
+        if (!res.isEmpty())
+            return res;
+        else
+            throw new UtenteNonTrovato("non ci sono utenti registrati");
     }
 
     @Transactional(readOnly = true)
-    public List<Cliente> mostraClientiNome(String nome){
+    public List<Cliente> mostraClientiNome(String nome) throws UtenteNonTrovato {
         List<Cliente> res= new ArrayList<>();
         res.addAll(clienteRepository.findByNomeContainingIgnoreCase(nome));
-        return res;
+        if (!res.isEmpty())
+            return res;
+        else
+            throw new UtenteNonTrovato("non ci sono utenti registrati a questo nome");
     }
 
     //TODO keycloack
