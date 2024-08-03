@@ -12,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 @Getter
@@ -38,4 +39,14 @@ public class Carrello {
     @ToString.Exclude
     @Column(name = "version")
     private long version;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Carrello carrello = (Carrello) o;
+        return Objects.equals(cliente, carrello.cliente) && prodotti.toString().equals(carrello.prodotti.toString());//TODO
+
+    }
+
 }

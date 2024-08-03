@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 @Getter
@@ -44,4 +45,12 @@ public class Ordine {
     @ManyToOne
     @JoinColumn(name = "cliente")
     private Cliente cliente;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ordine ordine = (Ordine) o;
+        return id == ordine.id && Objects.equals(carrello, ordine.carrello) && Objects.equals(indirizzo, ordine.indirizzo) && Objects.equals(data, ordine.data) && Objects.equals(cliente, ordine.cliente);
+    }
 }

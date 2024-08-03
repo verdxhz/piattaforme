@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Getter
@@ -37,5 +38,12 @@ public class Cliente {
     @ToString.Exclude
     private Carrello carrello;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cliente cliente = (Cliente) o;
+        return Objects.equals(nome, cliente.nome);
+    }
 
 }

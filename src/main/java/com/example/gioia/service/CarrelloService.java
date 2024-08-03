@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import java.util.List;
-
+import java.util.Objects;
 
 
 @Service
@@ -129,9 +129,14 @@ public class CarrelloService {
 
     //ordini
     @Transactional(readOnly = false)
-    public Ordine addOrdine(int carrelloId, String indirizzo) throws ProdottoInesistente, ProdottoInsufficiente, UtenteNonTrovato {
-
-        Carrello carrello = carrelloRepository.findById(carrelloId);
+    public Ordine addOrdine(Carrello carrello, String indirizzo) throws ProdottoInesistente, ProdottoInsufficiente, CarrelloErrato {
+        //controlli sul carrello
+        if (!carrelloRepository.existsById(carrello.getId()))
+            throw new CarrelloErrato("il carrello non esiste");
+        Carrello carrello2 = carrelloRepository.findById(carrello.getId());
+        if(!carrello.equals(carrello2))
+            throw new CarrelloErrato("il carrello è stato modificato ");
+        //controlli prodotti
         List<Prodotti_Carrello> prodotti=carrello.getProdotti();
         for(Prodotti_Carrello pc:prodotti){
             if(!prodottoRepository.existsById(pc.getProdotto().getId()))
@@ -139,6 +144,7 @@ public class CarrelloService {
             if (pc.getQuantità()> prodottoRepository.findById(pc.getProdotto().getId()).get().getDisponibilità())
                throw new ProdottoInsufficiente("il prodotto"+ pc.getProdotto().getNome().toString()+"è insufficiente");
         }
+        //ordine
         for(Prodotti_Carrello pc:prodotti){
             Prodotto p=pc.getProdotto();
             p.setDisponibilità(p.getDisponibilità()-pc.getQuantità());

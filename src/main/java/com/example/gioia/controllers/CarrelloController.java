@@ -22,11 +22,12 @@ public class CarrelloController {
 
     @PostMapping()
     @PreAuthorize("hasRole('utente')")
-    public ResponseEntity creaOrdine(@RequestParam int carrelloId,@RequestParam String indirizzo){
+    public ResponseEntity creaOrdine(@RequestBody Carrello carrello,@RequestParam String indirizzo){
         try{
-            Ordine res= carrelloService.addOrdine(carrelloId, indirizzo);
+            Ordine res= carrelloService.addOrdine(carrello, indirizzo);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch ( ProdottoInesistente | ProdottoInsufficiente | UtenteNonTrovato e){
+        }catch (ProdottoInesistente | ProdottoInsufficiente | CarrelloErrato e){
+            e.printStackTrace();
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
@@ -38,7 +39,6 @@ public class CarrelloController {
             Carrello res= carrelloService.addProdottiCarrello(clienteId, prodotto);
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (UtenteNonTrovato | ProdottoInesistente | ProdottoErrato e){
-            e.printStackTrace();
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }

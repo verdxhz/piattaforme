@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Objects;
+
 
 @Getter
 @Setter
@@ -35,8 +37,12 @@ public class Prodotti_Carrello {
     @Column(name = "quantità", nullable = false)
     private int quantità;
 
-
-
-
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Prodotti_Carrello that = (Prodotti_Carrello) o;
+        return id == that.id && quantità == that.quantità && Objects.equals(carrello, that.carrello) && Objects.equals(prodotto, that.prodotto);
+    }
 }
 
