@@ -93,4 +93,15 @@ Future<List<Prodotto>> mostraProdottiPrezzo(int min, int max) async {
   }
 }
 
+Future<List<Prodotto>> filtri(String parola, String categoria, int min, int max) async {
+  final response = await http.get(Uri.parse('http://localhost:8081/prodotto/filtri?parola=$parola&&categoria=$categoria&&min=$min&&max=$max'));
+  final co=response.statusCode;
+  if (response.statusCode == 200) {
+    List jsonResponse = json.decode(response.body);
+    return jsonResponse.map((product) => Prodotto.fromJson(product)).toList();
+  } else {
+    throw Exception('Failed to load products $co');
+  }
+}
+
 }

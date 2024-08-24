@@ -136,4 +136,20 @@ public class ProdottiService {
     }
 
 
+    @Transactional(readOnly = true)
+    public List<Prodotto> getProdottifiltri(String parola, String categoria, int min, int max, int numPag, int dimPag) throws ProdottoInesistente, IntervalloErrato {
+        List<Prodotto> p1= mostraProdottiNome(parola, numPag, dimPag);
+        List<Prodotto> p2= mostraProdottiCategoria(categoria,numPag,dimPag, "id");
+        List<Prodotto> p3= mostraProdottiPrezzo(min, max, numPag,dimPag,"id");
+        List<Prodotto> p= new ArrayList<>();
+        for(Prodotto pp : mostraProdotti(numPag,dimPag, "id")){
+            if(p1.contains(pp) && p2.contains(pp) && p3.contains(pp))
+                p.add(pp);
+        }
+        if (!p.isEmpty())
+            return p;
+        else{ throw new ProdottoInesistente("nessun prodotto trovato");}
+
+    }
+
 }

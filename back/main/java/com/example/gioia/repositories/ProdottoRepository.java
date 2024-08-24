@@ -14,6 +14,7 @@ import java.util.List;
 @Repository
 public interface ProdottoRepository extends JpaRepository<Prodotto, Integer> {
     //ricerca semplice
+    @Query("select p from Prodotto p where p.categoria like lower(concat( '%', ?1, '%'))")
     public Page<Prodotto> findByCategoria(String categoria, Pageable pageable);
     public List<Prodotto> findByDisponibilità(int disp);
 

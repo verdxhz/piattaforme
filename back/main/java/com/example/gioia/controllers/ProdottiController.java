@@ -114,4 +114,17 @@ public class ProdottiController {
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/filtri")
+    public ResponseEntity getfiltri(String parola, String categoria, int min, int max,@RequestParam(required = false, defaultValue = "0") int numPag,@RequestParam(required = false, defaultValue = "25") int dimPag){
+        try{
+            List<Prodotto> res= prodottiService.getProdottifiltri(parola,categoria,min,max,numPag,dimPag);
+            return new ResponseEntity(res, HttpStatus.OK);
+        }catch (ProdottoInesistente | IntervalloErrato e){
+            e.printStackTrace();
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
 }

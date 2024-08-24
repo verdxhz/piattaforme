@@ -16,6 +16,10 @@ class _HomeState extends State<Home> {
   final TextEditingController _textEditingController = TextEditingController();
   bool login = false; // TODO: true
   late Future<List<Prodotto>> prodotti;
+  String parola="";
+  String categoria="";
+  int min=0;
+  int max=3000;
 
 
   // Range slider state
@@ -32,24 +36,30 @@ class _HomeState extends State<Home> {
   // Search function based on name
   void cerca(String nome) {
     setState(() {
-      prodotti = ProdottoService().mostraProdottiNome(nome);
+      parola=nome;
     });
   }
 
+  void filtri(String parola, String categoria, int min, int max) {
+    setState(() {
+      prodotti = ProdottoService().filtri(parola,categoria,min,max);
+    });
+  }
   // Search function based on price range
   void cercaPrezzo(RangeValues range) {
     setState(() {
-      prodotti = ProdottoService().mostraProdottiPrezzo(range.start.floor(), range.end.ceil());
+      min=range.start.floor();
+      max=range.end.ceil();
     });
   }
 
   void cercaCategoria(String categoria){
     setState(() {
       if(_selectedButtonIndex!=-1) {
-        prodotti=ProdottoService().mostraProdottiCategoria(categoria);
+        this.categoria=categoria;
       }
       else
-        prodotti = ProdottoService().mostraProdotti();
+        this.categoria="";
     });
   }
 
@@ -76,6 +86,7 @@ class _HomeState extends State<Home> {
                       controller: _textEditingController,
                       onChanged: (text) {
                         cerca(text); // Trigger search when the input changes
+                        filtri(parola,categoria,min,max);
                       },
                       decoration: const InputDecoration(
                         hintText: "Cosa stai cercando?",
@@ -114,6 +125,7 @@ class _HomeState extends State<Home> {
                       setState(() {
                         _currentRangeValues = values;
                         cercaPrezzo(_currentRangeValues);
+                        filtri(parola,categoria,min,max);
                       });
                     },
                   ),
@@ -136,7 +148,8 @@ class _HomeState extends State<Home> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Center(child: Text('Nessun Prodotto Trovato'));
+                 // return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
                   return ListView.builder(
                     itemCount: snapshot.data!.length,
@@ -273,7 +286,7 @@ class _HomeState extends State<Home> {
   }
 
     TextButton buildTextButton(int index, String label) {
-    String categoria=" ";
+    String categoria="";
       switch(index) {
         case 0: categoria="collana"; break;
         case 1: categoria= "orecchini"; break;
@@ -288,6 +301,7 @@ class _HomeState extends State<Home> {
               _selectedButtonIndex = index;
                }// Aggiorna il pulsante selezionato
             cercaCategoria(categoria);
+            filtri(parola,this.categoria,min,max);
           });
         },
         style: ButtonStyle(
@@ -306,7 +320,7 @@ class _HomeState extends State<Home> {
             ),
           ),
         ),
-        child: Text(label),
+        child: Text(label, style: TextStyle(color: Colors.black),),
       );
   }
 }
