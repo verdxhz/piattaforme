@@ -17,8 +17,11 @@ class _HomeState extends State<Home> {
   bool login = false; // TODO: true
   late Future<List<Prodotto>> prodotti;
 
+
   // Range slider state
   RangeValues _currentRangeValues = const RangeValues(0, 3000);
+
+  late int _selectedButtonIndex=-1;
 
   @override
   void initState() {
@@ -37,6 +40,16 @@ class _HomeState extends State<Home> {
   void cercaPrezzo(RangeValues range) {
     setState(() {
       prodotti = ProdottoService().mostraProdottiPrezzo(range.start.floor(), range.end.ceil());
+    });
+  }
+
+  void cercaCategoria(String categoria){
+    setState(() {
+      if(_selectedButtonIndex!=-1) {
+        prodotti=ProdottoService().mostraProdottiCategoria(categoria);
+      }
+      else
+        prodotti = ProdottoService().mostraProdotti();
     });
   }
 
@@ -91,7 +104,6 @@ class _HomeState extends State<Home> {
                     activeTrackColor: Colors.black,
                     inactiveTrackColor: Colors.grey,
                     thumbColor: Colors.black,
-                    rangeThumbShape: RoundRangeSliderThumbShape(disabledThumbRadius: 2.0,),
                   ),
                   child: RangeSlider(
                     values: _currentRangeValues,
@@ -111,6 +123,7 @@ class _HomeState extends State<Home> {
                   '${_currentRangeValues.start.round()} € - ${_currentRangeValues.end.round()} €',
                   style: const TextStyle(fontSize: 16),
                 ),
+                listButton(),
               ],
             ),
           ),
@@ -243,5 +256,57 @@ class _HomeState extends State<Home> {
         ),
       );
     }
+  }
+
+  Widget listButton(){
+    return Row( children:[
+      const SizedBox(width: 20),
+      buildTextButton(0, 'collane'),
+      const SizedBox(width: 20),
+      buildTextButton(1, 'orecchini'),
+      const SizedBox(width: 20),
+      buildTextButton(2, 'bracciali'),
+      const SizedBox(width: 20),
+      buildTextButton(3, 'anelli'),
+     ]
+    );
+  }
+
+    TextButton buildTextButton(int index, String label) {
+    String categoria=" ";
+      switch(index) {
+        case 0: categoria="collana"; break;
+        case 1: categoria= "orecchini"; break;
+        case 2: categoria="bracciale"; break;
+        case 3: categoria= "anello";break;
+      }
+      return TextButton(
+        onPressed: () {
+          setState(() {
+            if(_selectedButtonIndex==index){_selectedButtonIndex=-1;}
+            else {
+              _selectedButtonIndex = index;
+               }// Aggiorna il pulsante selezionato
+            cercaCategoria(categoria);
+          });
+        },
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                (Set<MaterialState> states) {
+              // Cambia il colore di sfondo in base al pulsante selezionato
+              return _selectedButtonIndex == index ? Colors.grey : Colors.white;
+            },
+          ),
+          side: MaterialStateProperty.all<BorderSide>(
+            const BorderSide(color: Colors.black, width: 0.5),
+          ),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0.0),
+            ),
+          ),
+        ),
+        child: Text(label),
+      );
   }
 }
