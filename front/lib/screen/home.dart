@@ -210,6 +210,13 @@ class _HomeState extends State<Home> {
                                   TextButton(
                                     child: const Text('Aggiungi al carrello'),
                                     onPressed: () {
+                                      if (!login){
+                                        Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const LoginPage(),
+                                        ),
+                                      );}//Todo
                                       // Add to cart functionality
                                     },
                                   ),
