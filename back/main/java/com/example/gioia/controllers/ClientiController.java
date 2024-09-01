@@ -3,6 +3,7 @@ package com.example.gioia.controllers;
 import com.example.gioia.eccezioni.UtenteEsistente;
 import com.example.gioia.eccezioni.UtenteNonTrovato;
 import com.example.gioia.entity.Cliente;
+import com.example.gioia.security.authentication.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,18 @@ public class ClientiController {
         try{
             List<Cliente> res = clientiService.mostraClienti();
             return new ResponseEntity(res, HttpStatus.OK);
+        }catch(UtenteNonTrovato e){ e.printStackTrace();
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping()
+    public ResponseEntity getCliente(){
+        try{
+            Cliente res = clientiService.mostraCliente(Utils.getId());
+            return new ResponseEntity(res, HttpStatus.OK);
         }catch(UtenteNonTrovato e){
+            e.printStackTrace();
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }

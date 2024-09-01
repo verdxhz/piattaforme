@@ -37,8 +37,8 @@ class OrdineService{
     }
   }
 
-  Future<List<Ordine>> getOrdine(Cliente c) async {
-    final response = await http.get(Uri.parse('http://localhost:8081/carrello/cliente'), body: json.encode(c.toJson()));
+  Future<List<Ordine>> getOrdine(int c) async {
+    final response = await http.get(Uri.parse('http://localhost:8081/carrello/cliente?cliente=$c'));
     final co=response.statusCode;
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
@@ -48,8 +48,8 @@ class OrdineService{
     }
   }
 
-  Future<List<Prodotto>> getProdottiOrdine(Ordine o) async {
-    final response = await http.get(Uri.parse('http://localhost:8081/carrello/prodotti'), body: json.encode(o.toJson()));
+  Future<List<Prodotto>> getProdottiOrdine(int o) async {
+    final response = await http.get(Uri.parse('http://localhost:8081/carrello/prodotti?'));
     final co=response.statusCode;
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);

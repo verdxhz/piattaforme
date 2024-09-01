@@ -66,7 +66,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/cliente")
-    public ResponseEntity getOrdiniCliente(@RequestBody Cliente cliente){
+    public ResponseEntity getOrdiniCliente(@RequestParam int cliente){
         try{
             List<Ordine> res= carrelloService.mostraOrdiniCliente(cliente);
             return new ResponseEntity(res, HttpStatus.OK);
@@ -97,7 +97,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/prodotti")
-    public ResponseEntity getProdottiOrdine(@RequestBody Ordine carrello){
+    public ResponseEntity getProdottiOrdine(@RequestParam int carrello){
         try{
             List<Prodotto> res= carrelloService.mostraProdottiOrdine(carrello);
             return new ResponseEntity(res, HttpStatus.OK);
@@ -110,7 +110,7 @@ public class CarrelloController {
 
     @GetMapping("/carrello")
     @PreAuthorize("hasRole('utente')")
-    public ResponseEntity getCarrello(@RequestBody Cliente cliente){
+    public ResponseEntity getCarrello(@RequestParam int cliente){
         try{
             Carrello res= carrelloService.mostraCarrelloCliente(cliente);
             return new ResponseEntity(res, HttpStatus.OK);

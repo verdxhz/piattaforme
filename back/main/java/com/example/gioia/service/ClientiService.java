@@ -77,6 +77,12 @@ public class ClientiService {
             throw new UtenteNonTrovato("non ci sono utenti registrati a questo nome");
     }
 
-    //TODO keycloack
+    public Cliente mostraCliente(int id) throws UtenteNonTrovato {
+        Optional<Cliente> res=clienteRepository.findById(id);
+        if (!res.isEmpty())
+            return res.get();
+        else
+            throw new UtenteNonTrovato("non ci sono utenti registrati a questo nome");
+    }
+    }
 
-}

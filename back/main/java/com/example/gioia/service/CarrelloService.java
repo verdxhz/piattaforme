@@ -47,8 +47,6 @@ public class CarrelloService {
     public Carrello removeProdottiCarrello(int clienteId, int prodId) throws UtenteNonTrovato, ProdottoInesistente {
         if (!clienteRepository.existsById(clienteId))
             throw new UtenteNonTrovato("l'utente non esiste");//TODO chiedere se va tolto secondo me si
-        else if (!prodottoRepository.existsById(prodId))
-            throw new ProdottoInesistente("il prodotto che vuoi togliere dal carrello non esiste");//TODO chiedere se va tolto secondo me si
         else{
             Cliente cliente= clienteRepository.findById(clienteId).get();
             Carrello carrello = cliente.getCarrello();
@@ -78,8 +76,6 @@ public class CarrelloService {
     public Carrello addProdottiCarrello(int clienteId, Prodotto prod) throws UtenteNonTrovato, ProdottoInesistente, ProdottoErrato {
         if (!clienteRepository.existsById(clienteId))
             throw new UtenteNonTrovato("l'utente non esiste");//TODO chiedere se va tolto secondo me si
-        else if (!prodottoRepository.existsById(prod.getId()))
-            throw new ProdottoInesistente("il prodotto che vuoi aggiungere al carrello non esiste");//TODO chiedere se va tolto secondo me si
         else{
             Cliente cliente= clienteRepository.findById(clienteId).get();
             Carrello carrello = cliente.getCarrello();
@@ -116,10 +112,10 @@ public class CarrelloService {
         }}
 
     @Transactional(readOnly = true)
-    public Carrello mostraCarrelloCliente(Cliente cliente) throws UtenteNonTrovato, ProdottoInesistente {
-        if(!clienteRepository.existsById(cliente.getId_cliente()))
+    public Carrello mostraCarrelloCliente(int cliente) throws UtenteNonTrovato, ProdottoInesistente {
+        if(!clienteRepository.existsById(cliente))
             throw new UtenteNonTrovato("l'utente non esiste");//TODO chiedere se va tolto secondo me si
-        Carrello res=carrelloRepository.findByclient(cliente.getId_cliente());
+        Carrello res=carrelloRepository.findByclient(cliente);
         if(!res.getProdotti().isEmpty()){
             return res;
         }
@@ -172,10 +168,10 @@ public class CarrelloService {
     }
 
     @Transactional(readOnly = true)
-    public List<Ordine> mostraOrdiniCliente(Cliente cliente) throws UtenteNonTrovato, NessunOrdine {
-        if(!clienteRepository.existsById(cliente.getId_cliente()))
+    public List<Ordine> mostraOrdiniCliente(int cliente) throws UtenteNonTrovato, NessunOrdine {
+        if(!clienteRepository.existsById(cliente))
             throw new UtenteNonTrovato("l'utente non esiste");//TODO chiedere se va tolto secondo me si
-        List<Ordine> res=new ArrayList<>(ordineRepository.findByclient(cliente.getId_cliente()));
+        List<Ordine> res=new ArrayList<>(ordineRepository.findByclient(cliente));
         if (res.isEmpty())
             throw new NessunOrdine("non ci sono ordini del cliente");
         return res;
@@ -214,11 +210,11 @@ public class CarrelloService {
     }
 
     @Transactional(readOnly = true)
-    public List<Prodotto> mostraProdottiOrdine(Ordine ordine) throws NessunOrdine {
-        if(!ordineRepository.existsById(ordine.getId()))
+    public List<Prodotto> mostraProdottiOrdine(int ordine) throws NessunOrdine {
+        if(!ordineRepository.existsById(ordine))
             throw new NessunOrdine("l'ordine non esiste");
         List<Prodotto> res= new ArrayList<>();
-        for (Prodotti_Carrello p : ordine.getCarrello().getProdotti())
+        for (Prodotti_Carrello p : ordineRepository.findById(ordine).getCarrello().getProdotti())
             res.add(p.getProdotto());
         return res;
     }

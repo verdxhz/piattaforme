@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
+
+import '../utils/LogInResult.dart';
+import '../utils/authenticator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -8,16 +12,18 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool reg=true;
+  String username="";
+  String password="";
+  String _errorMessage = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey,
         body: Center(
-
         child:
         Container(
         decoration: BoxDecoration(color: Colors.black,borderRadius:BorderRadius.circular(30.0),
@@ -41,9 +47,9 @@ class _LoginPageState extends State<LoginPage> {
                 width: 300, // Larghezza fissa per il TextField
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextField(
-                  controller: _emailController,
+                  controller: _usernameController,
                   decoration: InputDecoration(
-                    hintText: 'Email',
+                    hintText: 'Username',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -84,7 +90,9 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         TextButton(
           onPressed: () {
-            // Logica di accesso
+            setState(() {
+              accesso();
+            });// Logica di accesso
           },
           style: TextButton.styleFrom(
             backgroundColor: Color.fromARGB(120, 81, 87, 100),
@@ -115,7 +123,9 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ],
     );
+
   }
+
   Widget nolog(){
     return TextButton(
       onPressed: () {
@@ -131,5 +141,51 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> accesso() async {
+
+      setState(() {
+        username=_usernameController.text;
+        password=_passwordController.text;
+        _errorMessage = '';
+      });
+
+      Authenticator authenticator = Authenticator();
+      LogInResult result = await authenticator.login(username, password);
+      setState(() {
+        if (result == LogInResult.logged) {
+          isLoggedIn = true;
+         // Navigator.pushNamedAndRemoveUntil(context, '/home', (Route<dynamic> route) => false);
+        } else if (result == LogInResult.error_wrong_credentials) {
+          _errorMessage = 'Credenziali errate. Riprova.';
+        } else if (result == LogInResult.error_not_fully_setupped) {
+          _errorMessage = 'Account non completamente configurato.';
+        } else {
+          _errorMessage = 'Errore sconosciuto. Riprova.';
+        }
+        toast();
+      });
+
+  }
+
+  toast() {
+    if (_errorMessage!=""){toastification.show(
+      context: context,
+      type: ToastificationType.error,
+      style: ToastificationStyle.minimal,
+      title: Text("Errore"),
+      description: Text(_errorMessage),
+      alignment: Alignment.center,
+      autoCloseDuration: const Duration(seconds: 4),
+      primaryColor: Color(0xff000000),
+      foregroundColor: Color(0xff000000),
+      borderRadius: BorderRadius.circular(4.0),
+      showProgressBar: false,
+      boxShadow: highModeShadow,
+      closeButtonShowType: CloseButtonShowType.onHover,
+      pauseOnHover: false,
+      applyBlurEffect: true,
+    );}
   }
 }

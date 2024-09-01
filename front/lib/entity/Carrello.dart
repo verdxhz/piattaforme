@@ -26,8 +26,8 @@ class Carrello{
 }
 class CarrelloService{
 
-  Future<void> aggiungiCarrello(Prodotto p) async {
-    final response = await http.put(Uri.parse('http://localhost:8081/carrello/addp'), body: p.toJson());
+  Future<void> aggiungiCarrello(Prodotto p, int cliente) async {
+    final response = await http.put(Uri.parse('http://localhost:8081/carrello/addp?clienteId=$cliente'), body: p.toJson());
     final co=response.statusCode;
     if (response.statusCode == 200) {
       return;
@@ -36,8 +36,8 @@ class CarrelloService{
     }
   }
 
-  Future<void> rimuoviCarrello(Prodotto p) async {
-    final response = await http.put(Uri.parse('http://localhost:8081/carrello/removep'), body: json.encode(p.toJson()));
+  Future<void> rimuoviCarrello(int p, int c) async {
+    final response = await http.put(Uri.parse('http://localhost:8081/carrello/removep?clienteId=$c&prodottoId=$p'));
     final co=response.statusCode;
     if (response.statusCode == 200) {
       return;
@@ -45,8 +45,8 @@ class CarrelloService{
       throw Exception('Failed to load products $co');
     }
   }
-  Future<Carrello> getCarrello(Cliente c) async {
-    final response = await http.get(Uri.parse('http://localhost:8081/carrello/carrello'), body: c.toJson());
+  Future<Carrello> getCarrello(int c) async {
+    final response = await http.get(Uri.parse('http://localhost:8081/carrello/carrello?cliente=$c'));
     final co=response.statusCode;
     if (response.statusCode == 200) {
       return Carrello.fromJson(json.decode(response.body));
