@@ -111,16 +111,20 @@ public class CarrelloService {
             return carrello;
         }}
 
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = false)
     public Carrello mostraCarrelloCliente(int cliente) throws UtenteNonTrovato, ProdottoInesistente {
         if(!clienteRepository.existsById(cliente))
             throw new UtenteNonTrovato("l'utente non esiste");//TODO chiedere se va tolto secondo me si
         Carrello res=carrelloRepository.findByclient(cliente);
-        if(!res.getProdotti().isEmpty()){
-            return res;
+        if(res==null){
+            res=new Carrello();
+            Cliente c= clienteRepository.findById(cliente).get();
+            res.setCliente(c);
+            carrelloRepository.save(res);
+            c.setCarrello(res);
+            clienteRepository.save(c);
         }
-        else
-            throw new ProdottoInesistente("non ci sono prodotti da visualizzare");
+        return res;
     }
 
     //ordini
@@ -178,21 +182,21 @@ public class CarrelloService {
     }
 
     @Transactional(readOnly = true)
-    public List<Ordine> mostraOrdiniPeriodo(Cliente cliente, LocalDateTime start, LocalDateTime end) throws IntervalloErrato, NessunOrdine, UtenteNonTrovato {
+    public List<Ordine> mostraOrdiniPeriodo(Integer cliente, LocalDateTime start, LocalDateTime end) throws IntervalloErrato, NessunOrdine, UtenteNonTrovato {
         if(start.compareTo(end) >= 0)
             throw new IntervalloErrato("la data di inizio non deve superare quella di fine");
         List<Ordine> res = new ArrayList<>();
         if(cliente == null){
             for (Cliente c: clienteRepository.findAll())
-                res.addAll(ordineRepository.findByIntervalloTempo(cliente.getId_cliente(),start,end));
+                res.addAll(ordineRepository.findByIntervalloTempo(cliente,start,end));
             if (res.isEmpty())
                 throw new NessunOrdine("non ci sono ordini nel periodo indicato");
             return res;
         }
         else{
-            if(!clienteRepository.existsById(cliente.getId_cliente()))
+            if(!clienteRepository.existsById(cliente))
                 throw new UtenteNonTrovato("l'utente non esiste");//TODO chiedere se va tolto secondo me si
-             res=ordineRepository.findByIntervalloTempo(cliente.getId_cliente(),start,end);
+             res=ordineRepository.findByIntervalloTempo(cliente,start,end);
             if (res.isEmpty())
                 throw new NessunOrdine("non ci sono ordini nel periodo indicato");
              return res;

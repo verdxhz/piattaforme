@@ -3,6 +3,7 @@ import 'package:toastification/toastification.dart';
 
 import '../utils/LogInResult.dart';
 import '../utils/authenticator.dart';
+import 'home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -156,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         if (result == LogInResult.logged) {
           isLoggedIn = true;
-         // Navigator.pushNamedAndRemoveUntil(context, '/home', (Route<dynamic> route) => false);
+          Navigator.pop(context,true);
         } else if (result == LogInResult.error_wrong_credentials) {
           _errorMessage = 'Credenziali errate. Riprova.';
         } else if (result == LogInResult.error_not_fully_setupped) {

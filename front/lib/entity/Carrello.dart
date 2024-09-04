@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:gioiafront/entity/Prodotto.dart';
 
+import '../utils/authenticator.dart';
 import 'Cliente.dart';
 import 'Prodotti_Carrello.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,10 @@ class Carrello{
   Carrello({required this.id, required this.cliente, required this.prodotti});
 
   factory Carrello.fromJson (Map<String, dynamic> json){
-    return Carrello(id: json['id'], cliente: Cliente.fromJson(json['cliente']),prodotti: (json["prodotti"] as List).map((i) => Prodotti_Carrello.fromJson(i)).toList());
+    return Carrello(id: json['id'], cliente: Cliente.fromJson(json['cliente']),prodotti: (json['prodotti'] != null && json['prodotti'] is List)
+        ? (json['prodotti'] as List).map((i) => Prodotti_Carrello.fromJson(i)).toList()
+        : [],
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -24,11 +28,12 @@ class Carrello{
 
 
 }
-class CarrelloService{
+class CarrelloService {
 
-  Future<void> aggiungiCarrello(Prodotto p, int cliente) async {
-    final response = await http.put(Uri.parse('http://localhost:8081/carrello/addp?clienteId=$cliente'), body: p.toJson());
-    final co=response.statusCode;
+  Future<void> aggiungiCarrello(Prodotto p) async {
+    final response = await http.put(
+        Uri.parse('http://localhost:8081/carrello/addp'), body: p.toJson(),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
+    final co = response.statusCode;
     if (response.statusCode == 200) {
       return;
     } else {
@@ -36,20 +41,35 @@ class CarrelloService{
     }
   }
 
-  Future<void> rimuoviCarrello(int p, int c) async {
-    final response = await http.put(Uri.parse('http://localhost:8081/carrello/removep?clienteId=$c&prodottoId=$p'));
-    final co=response.statusCode;
+  Future<void> rimuoviCarrello(int p) async {
+    final response = await http.put(
+        Uri.parse('http://localhost:8081/carrello/removep&prodottoId=$p'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
+    final co = response.statusCode;
     if (response.statusCode == 200) {
       return;
     } else {
       throw Exception('Failed to load products $co');
     }
   }
-  Future<Carrello> getCarrello(int c) async {
-    final response = await http.get(Uri.parse('http://localhost:8081/carrello/carrello?cliente=$c'));
-    final co=response.statusCode;
+
+  Future<Carrello> getCarrello() async {
+    final response = await http.get(
+        Uri.parse('http://localhost:8081/carrello/carrello'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
+    final co = response.statusCode;
     if (response.statusCode == 200) {
       return Carrello.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load products $co');
+    }
+  }
+
+  Future<List<Prodotto>> getProdottiCarrello(int carrello) async {
+    final response = await http.get(Uri.parse(
+        'http://localhost:8081/carrello/carrello/prodotti?carrello?carrello=$carrello'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
+    final co = response.statusCode;
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((product) => Prodotto.fromJson(product)).toList();
     } else {
       throw Exception('Failed to load products $co');
     }

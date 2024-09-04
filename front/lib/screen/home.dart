@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:gioiafront/entity/Carrello.dart';
 import '../entity/Prodotto.dart';
 import 'account.dart';
 import 'login.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key, required this.title});
 
-  final String title;
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
 
   @override
   State<Home> createState() => _HomeState();
@@ -14,13 +16,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final TextEditingController _textEditingController = TextEditingController();
-  bool login = false; // TODO: true
+  // TODO: true
   late Future<List<Prodotto>> prodotti;
   String parola="";
   String categoria="";
   int min=0;
   int max=3000;
-
+  bool login = false;
 
   // Range slider state
   RangeValues _currentRangeValues = const RangeValues(0, 3000);
@@ -209,16 +211,21 @@ class _HomeState extends State<Home> {
                                   ),
                                   TextButton(
                                     child: const Text('Aggiungi al carrello'),
-                                    onPressed: () {
+                                    onPressed: () async{
                                       if (!login){
-                                        Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const LoginPage(),
-                                        ),
-                                      );}//Todo
-                                      // Add to cart functionality
-                                    },
+                                          final result = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => const LoginPage(),
+                                            ),
+                                          );
+                                          if (result == true) {
+                                            setState(() {
+                                              login = true;  // Aggiorna lo stato di login
+                                            });
+                                        }
+                                      }
+                                      }//Todo
                                   ),
                                 ],
                               ),
@@ -260,13 +267,19 @@ class _HomeState extends State<Home> {
       );
     } else {
       return IconButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const LoginPage(),
             ),
           );
+
+          if (result == true) {
+            setState(() {
+              login = true;  // Aggiorna lo stato di login
+            });
+          }
         },
         tooltip: 'Login',
         icon: const Icon(

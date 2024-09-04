@@ -5,6 +5,7 @@ import com.example.gioia.entity.Carrello;
 import com.example.gioia.entity.Cliente;
 import com.example.gioia.entity.Ordine;
 import com.example.gioia.entity.Prodotto;
+import com.example.gioia.security.authentication.Utils;
 import com.example.gioia.service.CarrelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +35,9 @@ public class CarrelloController {
 
     @PutMapping("/addp")
     @PreAuthorize("hasRole('utente')")
-    public ResponseEntity addp(@RequestParam int clienteId, @RequestBody Prodotto prodotto){
+    public ResponseEntity addp(@RequestBody Prodotto prodotto){
         try{
-            Carrello res= carrelloService.addProdottiCarrello(clienteId, prodotto);
+            Carrello res= carrelloService.addProdottiCarrello(Utils.getId(), prodotto);
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (UtenteNonTrovato | ProdottoInesistente | ProdottoErrato e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
@@ -45,9 +46,9 @@ public class CarrelloController {
 
     @PutMapping("/removep")
     @PreAuthorize("hasRole('utente')")
-    public ResponseEntity removep(@RequestParam int clienteId, @RequestParam int prodottoId){
+    public ResponseEntity removep( @RequestParam int prodottoId){
         try{
-            Carrello res= carrelloService.removeProdottiCarrello(clienteId, prodottoId);
+            Carrello res= carrelloService.removeProdottiCarrello(Utils.getId(), prodottoId);
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (UtenteNonTrovato | ProdottoInesistente e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
@@ -66,9 +67,9 @@ public class CarrelloController {
     }
 
     @GetMapping("/cliente")
-    public ResponseEntity getOrdiniCliente(@RequestParam int cliente){
+    public ResponseEntity getOrdiniCliente(){
         try{
-            List<Ordine> res= carrelloService.mostraOrdiniCliente(cliente);
+            List<Ordine> res= carrelloService.mostraOrdiniCliente(Utils.getId());
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (UtenteNonTrovato | NessunOrdine e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
@@ -76,9 +77,9 @@ public class CarrelloController {
     }
 
     @GetMapping("/periodo")
-    public ResponseEntity getOrdiniPeriodo(@RequestBody Cliente cliente, @RequestParam LocalDateTime start, @RequestParam LocalDateTime end){
+    public ResponseEntity getOrdiniPeriodo( @RequestParam LocalDateTime start, @RequestParam LocalDateTime end){
         try{
-            List<Ordine> res= carrelloService.mostraOrdiniPeriodo(cliente,start,end);
+            List<Ordine> res= carrelloService.mostraOrdiniPeriodo(Utils.getId(),start,end);
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (IntervalloErrato | NessunOrdine | UtenteNonTrovato e){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
@@ -110,9 +111,9 @@ public class CarrelloController {
 
     @GetMapping("/carrello")
     @PreAuthorize("hasRole('utente')")
-    public ResponseEntity getCarrello(@RequestParam int cliente){
+    public ResponseEntity getCarrello(){
         try{
-            Carrello res= carrelloService.mostraCarrelloCliente(cliente);
+            Carrello res= carrelloService.mostraCarrelloCliente(Utils.getId());
             return new ResponseEntity(res, HttpStatus.OK);
         }catch ( UtenteNonTrovato | ProdottoInesistente e){
             e.printStackTrace();
