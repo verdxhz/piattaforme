@@ -119,7 +119,7 @@ class _CarrelloState extends State<CarrelloPage> {
                       },
                     );
                   } else {
-                    return const Center(child: Text('Carrello vuoto'));
+                    return const Center(child: Text('Carrello vuoto '));
                   }
                 },
               ),
