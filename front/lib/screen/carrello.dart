@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gioiafront/entity/Carrello.dart';
+import 'package:gioiafront/entity/Prodotti_Carrello.dart';
 
 import '../entity/Prodotto.dart';
 
@@ -11,8 +12,10 @@ class CarrelloPage extends StatefulWidget {
 }
 
 class _CarrelloState extends State<CarrelloPage> {
-  late Future<List<Prodotto>> prodotti;
+  Future<List<Prodotto>> prodotti=Future(() => []);
+  late List<Prodotti_Carrello> lineeordine;
   late Future<Carrello> carrello;
+  late Carrello cc;
 
   @override
   void initState() {
@@ -22,8 +25,9 @@ class _CarrelloState extends State<CarrelloPage> {
   }
 
   void getc() async {
-    final cc = await carrello;
-    debugPrint('${cc.id}');
+    cc = await carrello;
+   // debugPrint('${cc.id}');
+    lineeordine=cc.prodotti;
     getp(cc.id);
   }
 
@@ -110,6 +114,7 @@ class _CarrelloState extends State<CarrelloPage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
+                                    quantita(prodotto.id),
                                   ],
                                 ),
                               ],
@@ -156,4 +161,13 @@ class _CarrelloState extends State<CarrelloPage> {
       ],
     );
   }
+
+  Widget quantita(int id) {
+    int q=0;
+    for (Prodotti_Carrello p in lineeordine){
+      if (p.id==id)
+        q=p.quantita;
+  }
+    return Text('$q');
+}
 }

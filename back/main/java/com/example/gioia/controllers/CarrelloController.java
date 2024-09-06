@@ -98,17 +98,27 @@ public class CarrelloController {
     }
 
     @GetMapping("/prodotti")
-    public ResponseEntity getProdottiOrdine(@RequestParam int carrello){
+    public ResponseEntity getProdottiOrdine(@RequestParam int ordine) {
+        try {
+            List<Prodotto> res = carrelloService.mostraProdottiOrdine(ordine);
+            return new ResponseEntity(res, HttpStatus.OK);
+        } catch (NessunOrdine e) {
+            e.printStackTrace();
+            return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/prodottic")
+    public ResponseEntity getProdotticarrello(@RequestParam int carrello){
         try{
-            List<Prodotto> res= carrelloService.mostraProdottiOrdine(carrello);
+            List<Prodotto> res= carrelloService.mostraProdottiCarrello(carrello);
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (NessunOrdine e){
+            e.printStackTrace();
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
 
 
     }
-
     @GetMapping("/carrello")
     @PreAuthorize("hasRole('utente')")
     public ResponseEntity getCarrello(){

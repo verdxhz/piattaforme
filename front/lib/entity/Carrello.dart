@@ -22,7 +22,7 @@ class Carrello{
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'cliente': cliente.toJson(),
+    'cliente': cliente,
     'prodotti': prodotti.map((e) => e.toJson()).toList(),
   };
 
@@ -37,7 +37,7 @@ class CarrelloService {
     if (response.statusCode == 200) {
       return;
     } else {
-      throw Exception('Failed to load products $co');
+      throw Exception('Failed to add $co');
     }
   }
 
@@ -57,15 +57,16 @@ class CarrelloService {
         Uri.parse('http://localhost:8081/carrello/carrello'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
     final co = response.statusCode;
     if (response.statusCode == 200) {
+      print(response.body);
       return Carrello.fromJson(json.decode(response.body));
     } else {
-      throw Exception('Failed to load products $co');
+      throw Exception('il carrello è vuoto $co');
     }
   }
 
   Future<List<Prodotto>> getProdottiCarrello(int carrello) async {
     final response = await http.get(Uri.parse(
-        'http://localhost:8081/carrello/carrello/prodotti?carrello?carrello=$carrello'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
+        'http://localhost:8081/carrello/prodottic?carrello=$carrello'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
     final co = response.statusCode;
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);

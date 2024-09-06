@@ -23,6 +23,7 @@ public class Prodotti_Carrello {
     @Column(name = "id", nullable = false)
     private int id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "carrello")
     private Carrello carrello;
@@ -32,15 +33,19 @@ public class Prodotti_Carrello {
     private Prodotto prodotto;
 
     @Basic
-    @Column(name = "quantità", nullable = false)
-    private int quantità;
+    @Column(name = "quantita", nullable = true)
+    private int quantita;
+
+    @Basic
+    @Column(name = "prezzo", nullable = true)
+    private float prezzo;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Prodotti_Carrello that = (Prodotti_Carrello) o;
-        return id == that.id && quantità == that.quantità && Objects.equals(carrello, that.carrello) && Objects.equals(prodotto, that.prodotto);
+        return id == that.id && quantita == that.quantita && Objects.equals(carrello, that.carrello) && Objects.equals(prodotto, that.prodotto);
     }
 }
 

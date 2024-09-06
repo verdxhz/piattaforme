@@ -1,21 +1,21 @@
-import 'Carrello.dart';
+
 import 'Prodotto.dart';
 class Prodotti_Carrello{
   int id;
   Prodotto prodotto;
-  Carrello carrello;
   int quantita;
+  double prezzo;
 
-  Prodotti_Carrello({required this.id, required this.prodotto, required this.carrello, required this.quantita});
+  Prodotti_Carrello({required this.id, required this.prodotto, required this.quantita, required this.prezzo,});
 
   factory Prodotti_Carrello.fromJson(Map<String,dynamic> json){
     return Prodotti_Carrello(
-        id: json['id'], prodotto: Prodotto.fromJson(json['prodotto']), carrello: Carrello.fromJson(json['carrello']), quantita: json['quantità']);
+        id: json['id'], prodotto: Prodotto.fromJson(json['prodotto']), quantita: json['quantita']??0,  prezzo: json['prezzo']  ?? 0.0);
   }
   Map<String, dynamic> toJson() => {
     'id':id,
     'prodotto': prodotto.toJson(),
-    'carrello': carrello.toJson(),
-    'quantità': quantita,
+    'quantita': quantita,
+    'prezzo': prezzo,
   };
 }

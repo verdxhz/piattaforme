@@ -54,7 +54,7 @@ public class CarrelloService {
             Prodotti_Carrello prodInCarr = prodotti_Carrello_Repository.findByCarrelloAndProdotto(carrello, prodotto);
                 if (prodInCarr != null) {
                     // Aggiorna la quantità nel carrello
-                    int newQuantity = prodInCarr.getQuantità() - 1;
+                    int newQuantity = prodInCarr.getQuantita() - 1;
                     if (newQuantity == 0) {
                         prodotti_Carrello_Repository.delete(prodInCarr);
                         List<Prodotti_Carrello> p= carrello.getProdotti();
@@ -62,7 +62,7 @@ public class CarrelloService {
                         carrello.setProdotti(p);
                         carrelloRepository.save(carrello);
                     } else {
-                        prodInCarr.setQuantità(newQuantity);
+                        prodInCarr.setQuantita(newQuantity);
                         prodotti_Carrello_Repository.save(prodInCarr);
                     }
                 } else {
@@ -94,12 +94,13 @@ public class CarrelloService {
                 prodInCarr= new Prodotti_Carrello();
                 prodInCarr.setCarrello(carrello);
                 prodInCarr.setProdotto(prodotto);
-                prodInCarr.setQuantità(1);
+                prodInCarr.setQuantita(1);
+                prodInCarr.setPrezzo(prodotto.getPrezzo());//TODO
                 prodotti_Carrello_Repository.save(prodInCarr);
             }
             else{
 
-                prodInCarr.setQuantità(prodInCarr.getQuantità()+1);
+                prodInCarr.setQuantita(prodInCarr.getQuantita()+1);
                 prodotti_Carrello_Repository.save(prodInCarr);
             }
             List<Prodotti_Carrello> prodd= new ArrayList<>();
@@ -116,15 +117,11 @@ public class CarrelloService {
         if(!clienteRepository.existsById(cliente))
             throw new UtenteNonTrovato("l'utente non esiste");//TODO chiedere se va tolto secondo me si
         Carrello res=carrelloRepository.findByclient(cliente);
-        if(res==null){
-            res=new Carrello();
-            Cliente c= clienteRepository.findById(cliente).get();
-            res.setCliente(c);
-            carrelloRepository.save(res);
-            c.setCarrello(res);
-            clienteRepository.save(c);
+        if(res!=null){
+            return res;
         }
-        return res;
+        else
+            throw new ProdottoInesistente("il carrello è vuoto");
     }
 
     //ordini
@@ -141,13 +138,13 @@ public class CarrelloService {
         for(Prodotti_Carrello pc:prodotti){
             if(!prodottoRepository.existsById(pc.getProdotto().getId()))
                 throw new ProdottoInesistente("il prodotto da comprare non esiste");
-            if (pc.getQuantità()> prodottoRepository.findById(pc.getProdotto().getId()).get().getDisponibilità())
+            if (pc.getQuantita()> prodottoRepository.findById(pc.getProdotto().getId()).get().getDisponibilità())
                throw new ProdottoInsufficiente("il prodotto"+ pc.getProdotto().getNome().toString()+"è insufficiente");
         }
         //ordine
         for(Prodotti_Carrello pc:prodotti){
             Prodotto p=pc.getProdotto();
-            p.setDisponibilità(p.getDisponibilità()-pc.getQuantità());
+            p.setDisponibilità(p.getDisponibilità()-pc.getQuantita());
             prodottoRepository.save(p);
         }
         Cliente cliente= carrello.getCliente();
@@ -219,6 +216,15 @@ public class CarrelloService {
             throw new NessunOrdine("l'ordine non esiste");
         List<Prodotto> res= new ArrayList<>();
         for (Prodotti_Carrello p : ordineRepository.findById(ordine).getCarrello().getProdotti())
+            res.add(p.getProdotto());
+        return res;
+    }
+    @Transactional(readOnly = true)
+    public List<Prodotto> mostraProdottiCarrello(int carrello) throws NessunOrdine {
+        if(!carrelloRepository.existsById(carrello))
+            throw new NessunOrdine("l'ordine non esiste");
+        List<Prodotto> res= new ArrayList<>();
+        for (Prodotti_Carrello p : carrelloRepository.findById(carrello).getProdotti())
             res.add(p.getProdotto());
         return res;
     }
