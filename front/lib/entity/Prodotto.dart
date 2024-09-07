@@ -24,12 +24,12 @@ class Prodotto {
   factory Prodotto.fromJson(Map<String, dynamic> json) {
     return Prodotto(
       id: json['id'], // Valore predefinito se null
-      nome: json['nome'],
+      nome: json['nome']??'',
       descrizione: json['descrizione'] ?? ' ',
-      prezzo: json['prezzo'] , // Conversione sicura da null a double
-      immagine: json['immagine'] , // Immagine di default
-      categoria: json['categoria'] ,
-      disponibilita: json['disponibilità'] ?? 0, // Disponibilità predefinita se null
+      prezzo: json['prezzo']??0.0 , // Conversione sicura da null a double
+      immagine: json['immagine'] ??'', // Immagine di default
+      categoria: json['categoria'] ??'',
+      disponibilita: json['disponibilita'] ?? 0, // Disponibilità predefinita se null
     );
   }
 
@@ -44,7 +44,7 @@ class Prodotto {
       'immagine': immagine,
       'descrizione': descrizione,
       'categoria': categoria,
-      'disponibilità': disponibilita,
+      'disponibilita': disponibilita,
     };
   }
 }

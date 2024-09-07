@@ -10,7 +10,7 @@ class Prodotti_Carrello{
 
   factory Prodotti_Carrello.fromJson(Map<String,dynamic> json){
     return Prodotti_Carrello(
-        id: json['id'], prodotto: Prodotto.fromJson(json['prodotto']), quantita: json['quantita']??0,  prezzo: json['prezzo']  ?? 0.0);
+        id: json['id'], prodotto: Prodotto.fromJson(json['prodotto']), quantita: json['quantita'],  prezzo: json['prezzo']  ?? 0.0);
   }
   Map<String, dynamic> toJson() => {
     'id':id,

@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gioiafront/entity/Carrello.dart';
+import 'package:gioiafront/entity/Cliente.dart';
 import 'package:gioiafront/entity/Prodotti_Carrello.dart';
 
 import '../entity/Prodotto.dart';
@@ -12,27 +17,27 @@ class CarrelloPage extends StatefulWidget {
 }
 
 class _CarrelloState extends State<CarrelloPage> {
-  Future<List<Prodotto>> prodotti=Future(() => []);
-  late List<Prodotti_Carrello> lineeordine;
+  Future<List<Prodotto>> prodotti = Future(() => []);
   late Future<Carrello> carrello;
   late Carrello cc;
 
   @override
   void initState() {
     super.initState();
-    carrello = CarrelloService().getCarrello();
     getc();
   }
 
   void getc() async {
+    carrello = CarrelloService().getCarrello();
     cc = await carrello;
-   // debugPrint('${cc.id}');
-    lineeordine=cc.prodotti;
-    getp(cc.id);
+    // debugPrint('${cc.id}');
+
+   getp(cc.id);
   }
 
   void getp(int id) {
     setState(() {
+     // lineeordine = cc.prodotti;
       prodotti = CarrelloService().getProdottiCarrello(id);
     });
   }
@@ -69,22 +74,14 @@ class _CarrelloState extends State<CarrelloPage> {
                               border: Border.all(
                                 color: const Color.fromRGBO(1, 1, 1, 0.1),
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  spreadRadius: 3,
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Image.asset(
                                   prodotto.immagine,
-                                  height: 160,
-                                  width: 160,
+                                  height: 100,
+                                  width: 100,
                                   fit: BoxFit.cover,
                                 ),
                                 const SizedBox(width: 100),
@@ -114,7 +111,27 @@ class _CarrelloState extends State<CarrelloPage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    quantita(prodotto.id),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                            onPressed: () {
+                                              setState(
+                                                () {
+                                                  rimuovi(prodotto);
+                                                },
+                                              );
+                                            },
+                                            icon: Icon(Icons.remove)),
+                                        Text(quantita(prodotto.id)),
+                                        IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                aggiungi(prodotto);
+                                              });
+                                            },
+                                            icon: Icon(Icons.add)),
+                                      ],
+                                    )
                                   ],
                                 ),
                               ],
@@ -144,12 +161,32 @@ class _CarrelloState extends State<CarrelloPage> {
                 color: const Color.fromARGB(100, 81, 87, 100),
               ),
               child: Center(
-                child: Text(
-                  'Summary',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      totaleconto(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        mostraMessaggioDialog(context);
+                      },
+                      child: Text(
+                        'ACQUISTA ORA',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color.fromARGB(120, 81, 87, 100),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -162,12 +199,91 @@ class _CarrelloState extends State<CarrelloPage> {
     );
   }
 
-  Widget quantita(int id) {
-    int q=0;
-    for (Prodotti_Carrello p in lineeordine){
-      if (p.id==id)
-        q=p.quantita;
+  String quantita(int id) {
+    int q = 0;
+    for (Prodotti_Carrello p in cc.prodotti) {
+      if (p.prodotto.id == id)
+        q = p.quantita;
+    }
+    return '$q';
   }
-    return Text('$q');
-}
+
+  void aggiungi(Prodotto prodotto) async {
+    await CarrelloService().aggiungiCarrello(prodotto);
+    getc();
+  }
+
+  void rimuovi(Prodotto prodotto) async {
+    await CarrelloService().rimuoviCarrello(prodotto.id);
+    getc();
+  }
+
+  String totaleconto() {
+    double conto = 0;
+    for (Prodotti_Carrello p in cc.prodotti) {
+      conto += (p.quantita * p.prezzo);
+    }
+    return 'totale=$conto €';
+  }
+
+  void mostraMessaggioDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+          title: Text(
+            "Conferma",
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min, // Mantiene la finestra compatta
+            children: [
+              Text(
+                "Vuoi confermare questo ordine?",
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20), // Spazio tra il testo e i bottoni
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center, // Centra i bottoni
+                children: [
+                  TextButton(
+                    child: Text(
+                      "Conferma",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Azione di conferma
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color.fromARGB(120, 81, 87, 100),
+                    ),
+                  ),
+                  SizedBox(width: 20), // Spazio tra i due bottoni
+                  TextButton(
+                    child: Text(
+                      "Chiudi",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Chiudi il dialog
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color.fromARGB(120, 81, 87, 100),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+//TODO sbaglia quantità
 }

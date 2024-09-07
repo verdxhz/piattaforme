@@ -138,13 +138,13 @@ public class CarrelloService {
         for(Prodotti_Carrello pc:prodotti){
             if(!prodottoRepository.existsById(pc.getProdotto().getId()))
                 throw new ProdottoInesistente("il prodotto da comprare non esiste");
-            if (pc.getQuantita()> prodottoRepository.findById(pc.getProdotto().getId()).get().getDisponibilità())
+            if (pc.getQuantita()> prodottoRepository.findById(pc.getProdotto().getId()).get().getDisponibilita())
                throw new ProdottoInsufficiente("il prodotto"+ pc.getProdotto().getNome().toString()+"è insufficiente");
         }
         //ordine
         for(Prodotti_Carrello pc:prodotti){
             Prodotto p=pc.getProdotto();
-            p.setDisponibilità(p.getDisponibilità()-pc.getQuantita());
+            p.setDisponibilita(p.getDisponibilita()-pc.getQuantita());
             prodottoRepository.save(p);
         }
         Cliente cliente= carrello.getCliente();

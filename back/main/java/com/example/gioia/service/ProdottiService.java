@@ -26,7 +26,7 @@ public class ProdottiService {
           Optional<Prodotto> p=prodottoRepository.findById(prodotto.getId());
           if (!p.get().equals(prodotto))
               throw new ProdottoInesistente("il prodotto ha dei valori errati");
-            p.get().setDisponibilità((prodotto.getDisponibilità() + prodotto.getDisponibilità()));
+            p.get().setDisponibilita((prodotto.getDisponibilita() + prodotto.getDisponibilita()));
             return p.get();
         }
         else
@@ -52,7 +52,7 @@ public class ProdottiService {
             pp.setNome(prodotto.getNome());
             pp.setDescrizione(prodotto.getDescrizione());
             pp.setPrezzo(prodotto.getPrezzo());
-            pp.setDisponibilità(prodotto.getDisponibilità());
+            pp.setDisponibilita(prodotto.getDisponibilita());
             pp.setImmagine(prodotto.getImmagine());
             pp.setCategoria(prodotto.getCategoria());
             // Salva l'entity aggiornata nel database
@@ -128,7 +128,7 @@ public class ProdottiService {
 
     @Transactional(readOnly = true)
     public List<Prodotto> getProdottiTerminati() throws ProdottoInesistente {
-        List<Prodotto> p= prodottoRepository.findByDisponibilità(0);
+        List<Prodotto> p= prodottoRepository.findByDisponibilita(0);
         if (!p.isEmpty())
             return p;
         else{ throw new ProdottoInesistente("nessun prodotto terminato");}

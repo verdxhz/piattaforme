@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gioiafront/screen/carrello.dart';
+import 'package:gioiafront/utils/authenticator.dart';
+
+import '../entity/Cliente.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -9,6 +12,10 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
+
+  
+
+  
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -27,6 +34,10 @@ class _AccountState extends State<Account> {
                     height: 90,
                     width: 160,
                   ),
+                  Expanded(child: SizedBox()),
+                  IconButton(onPressed: (){logoutCli();}, icon: Icon(Icons.logout,
+                    color: Colors.white,
+                    size: 30.0,))
                 ],
               ),
             ),
@@ -56,5 +67,10 @@ class _AccountState extends State<Account> {
         ),
       ),
     );
+  }
+
+  void logoutCli() async {
+    await Authenticator().logOut();
+    Navigator.pop(context, false);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gioiafront/entity/Carrello.dart';
+import 'package:toastification/toastification.dart';
 import '../entity/Prodotto.dart';
 import 'account.dart';
 import 'login.dart';
@@ -222,10 +223,25 @@ class _HomeState extends State<Home> {
                                           if (result == true) {
                                             setState(() {
                                               login = true;  // Aggiorna lo stato di login
+
                                             });
                                         }
                                       }
-                                      }//Todo
+                                        await CarrelloService().aggiungiCarrello(prodotto);
+                                      toastification.show(
+                                          context: context,
+                                          type: ToastificationType.success,
+                                          style: ToastificationStyle.minimal,
+                                          title: Text("aggiunto al carrello con successo"),
+                                      alignment: Alignment.centerRight,
+                                      autoCloseDuration: const Duration(seconds: 4),
+                                      primaryColor: Color(0xff000000),
+                                      icon: Icon(Icons.shopping_cart_outlined),
+                                      borderRadius: BorderRadius.circular(4.0),
+                                      boxShadow: highModeShadow,
+                                      showProgressBar: false,
+                                      applyBlurEffect: true,);
+                                      }
                                   ),
                                 ],
                               ),
@@ -250,13 +266,32 @@ class _HomeState extends State<Home> {
   Widget log() {
     if (login) {
       return IconButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const Account(),
             ),
           );
+          if (result == false) {
+            setState(() {
+              login = false;
+              toastification.show(
+                context: context,
+                type: ToastificationType.success,
+                style: ToastificationStyle.minimal,
+                title: Text("logout avvenuto con successo"),
+                alignment: Alignment.centerRight,
+                autoCloseDuration: const Duration(seconds: 4),
+                primaryColor: Color(0xff000000),
+                icon: Icon(Icons.logout),
+                borderRadius: BorderRadius.circular(4.0),
+                boxShadow: highModeShadow,
+                showProgressBar: false,
+                applyBlurEffect: true,
+              );// Aggiorna lo stato di login
+            });
+          }
         },
         tooltip: 'Account',
         icon: const Icon(

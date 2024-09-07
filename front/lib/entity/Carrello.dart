@@ -32,7 +32,7 @@ class CarrelloService {
 
   Future<void> aggiungiCarrello(Prodotto p) async {
     final response = await http.put(
-        Uri.parse('http://localhost:8081/carrello/addp'), body: p.toJson(),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
+        Uri.parse('http://localhost:8081/carrello/addp'), body: jsonEncode(p.toJson()),headers: {'Authorization':'Bearer ${Authenticator().getToken()}','Content-Type': 'application/json',});
     final co = response.statusCode;
     if (response.statusCode == 200) {
       return;
@@ -43,7 +43,7 @@ class CarrelloService {
 
   Future<void> rimuoviCarrello(int p) async {
     final response = await http.put(
-        Uri.parse('http://localhost:8081/carrello/removep&prodottoId=$p'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}'});
+        Uri.parse('http://localhost:8081/carrello/removep?prodottoId=$p'),headers: {'Authorization':'Bearer ${Authenticator().getToken()}','Content-Type': 'application/json',});
     final co = response.statusCode;
     if (response.statusCode == 200) {
       return;

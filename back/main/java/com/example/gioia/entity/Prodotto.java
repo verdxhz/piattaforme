@@ -40,8 +40,8 @@ public class Prodotto {
     private String categoria;
 
     @Basic
-    @Column(name = "disponibilità", nullable = false)
-    private int disponibilità;
+    @Column(name = "disponibilita", nullable = true)
+    private int disponibilita;
 
     @Basic
     @Column(name = "immagine", nullable = false)
