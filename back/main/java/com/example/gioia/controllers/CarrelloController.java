@@ -67,6 +67,7 @@ public class CarrelloController {
     }
 
     @GetMapping("/cliente")
+    @PreAuthorize("hasRole('utente')")
     public ResponseEntity getOrdiniCliente(){
         try{
             List<Ordine> res= carrelloService.mostraOrdiniCliente(Utils.getId());

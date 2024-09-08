@@ -218,6 +218,15 @@ class _CarrelloState extends State<CarrelloPage> {
     getc();
   }
 
+  String getPrezzoBloccato(int id) {//questo serve più per gli ordini quindi in creaordine mettere metodo che blocca il prezzo e toglilo da addp
+    double prezzo = 0;
+    for (Prodotti_Carrello p in cc.prodotti) {
+      if (p.prodotto.id == id)
+        prezzo = p.prezzo;
+    }
+    return '$prezzo';
+  }
+
   String totaleconto() {
     double conto = 0;
     for (Prodotti_Carrello p in cc.prodotti) {

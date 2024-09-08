@@ -38,7 +38,7 @@ public class Ordine {
 
     @Basic
     @CreationTimestamp
-    @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "data", nullable = false)
     private LocalDateTime data;
 

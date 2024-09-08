@@ -1,11 +1,12 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../utils/authenticator.dart';
 import 'Prodotto.dart';
-
 import 'Cliente.dart';
 import 'Carrello.dart';
-class Ordine{
+
+class Ordine {
   int id;
   Carrello carrello;
   String indirizzo;
@@ -14,49 +15,63 @@ class Ordine{
 
   Ordine({required this.id, required this.carrello, required this.indirizzo, required this.data, required this.cliente});
 
-  factory Ordine.fromJson(Map<String,dynamic> json){
-    return Ordine(id: json['id'], carrello: Carrello.fromJson(json['carrello']),indirizzo: json['indirizzo'],data: DateTime.parse(json['data']),cliente: Cliente.fromJson(json['cliente']));
+  factory Ordine.fromJson(Map<String, dynamic> json) {
+    return Ordine(
+      id: json['id'],
+      carrello: Carrello.fromJson(json['carrello']),
+      indirizzo: json['indirizzo'],
+      data: DateTime.parse(json['data']),
+      cliente: Cliente.fromJson(json['cliente']),
+    );
   }
+
   Map<String, dynamic> toJson() => {
-    'id':id,
+    'id': id,
     'carrello': carrello.toJson(),
     'indirizzo': indirizzo,
-    'data':data.toIso8601String(),
+    'data': data.toIso8601String(), // Formato ISO 8601
     'cliente': cliente.toJson(),
-
   };
 }
-class OrdineService{
+
+class OrdineService {
   Future<void> creaOrdine(Carrello c, String indirizzo) async {
-    final response = await http.post(Uri.parse('http://localhost:8081/carrello?indirizzo=$indirizzo'), body: json.encode(c.toJson()));
-    final co=response.statusCode;
+    final response = await http.post(
+      Uri.parse('http://localhost:8081/carrello?indirizzo=$indirizzo'),
+      body: json.encode(c.toJson()),
+    );
     if (response.statusCode == 200) {
       return;
     } else {
-      throw Exception('Failed to load products $co');
+      throw Exception('Failed to create order. Status code: ${response.statusCode}');
     }
   }
 
-  Future<List<Ordine>> getOrdine(int c) async {
-    final response = await http.get(Uri.parse('http://localhost:8081/carrello/cliente?cliente=$c'));
-    final co=response.statusCode;
+  Future<List<Ordine>> getOrdine() async {
+    final response = await http.get(
+      Uri.parse('http://localhost:8081/carrello/cliente'),
+      headers: {
+        'Authorization': 'Bearer ${Authenticator().getToken()}',
+        'Content-Type': 'application/json',
+      },
+    );
+
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((product) => Ordine.fromJson(product)).toList();
+      return jsonResponse.map((order) => Ordine.fromJson(order)).toList();
     } else {
-      throw Exception('Failed to load products $co');
+      throw Exception('Failed to load orders. Status code: ${response.statusCode}');
     }
   }
 
   Future<List<Prodotto>> getProdottiOrdine(int o) async {
-    final response = await http.get(Uri.parse('http://localhost:8081/carrello/prodotti?'));
-    final co=response.statusCode;
+    final response = await http.get(Uri.parse('http://localhost:8081/carrello/prodotti?ordine=$o'));
+
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
       return jsonResponse.map((product) => Prodotto.fromJson(product)).toList();
     } else {
-      throw Exception('Failed to load products $co');
+      throw Exception('Failed to load products. Status code: ${response.statusCode}');
     }
   }
-
 }

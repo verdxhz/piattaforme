@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gioiafront/screen/carrello.dart';
+import 'package:gioiafront/screen/ordini.dart';
 import 'package:gioiafront/utils/authenticator.dart';
 
 import '../entity/Cliente.dart';
@@ -59,7 +60,7 @@ class _AccountState extends State<Account> {
               child: TabBarView(
                 children: [
                   Center(child: CarrelloPage()),
-                  Center(child: Text('Storico degli Ordini')),
+                  Center(child: OrdiniPage()),
                 ],
               ),
             ),

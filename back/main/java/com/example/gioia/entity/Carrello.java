@@ -44,7 +44,7 @@ public class Carrello {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Carrello carrello = (Carrello) o;
-        return Objects.equals(cliente, carrello.cliente) && prodotti.toString().equals(carrello.prodotti.toString());//TODO
+        return Objects.equals(cliente, carrello.cliente) && prodotti.equals(carrello.prodotti);//TODO
 
     }
 
