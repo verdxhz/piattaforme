@@ -17,19 +17,12 @@ class OrdiniPage extends StatefulWidget {
 
 class _OrdiniState extends State<OrdiniPage> with TickerProviderStateMixin {
   Future<List<Ordine>> ordini = Future(() => []);
-  late AnimationController _controller;
-  late Animation<double> _animation;
-  bool isRotated = false;
 
   @override
   void initState() {
     super.initState();
     getc();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _animation = Tween<double>(begin: 0, end: 0.25).animate(_controller);
+
   }
 
   void getc() async {
@@ -67,7 +60,7 @@ class _OrdiniState extends State<OrdiniPage> with TickerProviderStateMixin {
                         ListTile(
                           title: Text(
                               '${ordine.data.day}-${ordine.data.month}-${ordine.data.year}'),
-                          subtitle: Text('${ordine.indirizzo}'),
+                          subtitle: Row(children: [Text('${ordine.indirizzo}'),Expanded(child: SizedBox()), getConto(ordine)],)
                         ),
                         FutureBuilder<List<Prodotto>>(
                           future: OrdineService().getProdottiOrdine(ordine.id),
@@ -152,20 +145,15 @@ class _OrdiniState extends State<OrdiniPage> with TickerProviderStateMixin {
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
-  void _toggleRotation() {
-    setState(() {
-      if (isRotated) {
-        _controller.reverse(); // Torna alla posizione iniziale
-      } else {
-        _controller.forward(); // Ruota di 90 gradi
-      }
-      isRotated = !isRotated;
-    });
-  }
+
+
+
+ Widget getConto(Ordine ordine) {
+    double conto=0;
+    Carrello c=ordine.carrello;
+    for (Prodotti_Carrello p in c.prodotti)
+      conto+=p.prezzo;
+    return Text('totale: $conto €');
+ }
 }
