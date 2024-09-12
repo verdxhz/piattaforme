@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:gioiafront/entity/Carrello.dart';
 import 'package:gioiafront/entity/Cliente.dart';
+import 'package:gioiafront/entity/Ordine.dart';
 import 'package:gioiafront/entity/Prodotti_Carrello.dart';
 
 import '../entity/Prodotto.dart';
@@ -20,6 +21,7 @@ class _CarrelloState extends State<CarrelloPage> {
   Future<List<Prodotto>> prodotti = Future(() => []);
   late Future<Carrello> carrello;
   late Carrello cc;
+  TextEditingController _indirizzocontroller= TextEditingController();
 
   @override
   void initState() {
@@ -240,49 +242,51 @@ class _CarrelloState extends State<CarrelloPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Color.fromARGB(255, 255, 255, 255),
-          title: Text(
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          title: const Text(
             "Conferma",
             textAlign: TextAlign.center,
           ),
           content: Column(
-            mainAxisSize: MainAxisSize.min, // Mantiene la finestra compatta
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 "Vuoi confermare questo ordine?",
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20), // Spazio tra il testo e i bottoni
+              const SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center, // Centra i bottoni
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    child: Text(
+                    child: const Text(
                       "Conferma",
                       style: TextStyle(
                         color: Colors.white,
                       ),
                     ),
                     onPressed: () {
-                      Navigator.of(context).pop(); // Azione di conferma
+                      // Chiude la prima dialog e, quando è chiusa, apre la seconda
+                      Navigator.of(context).pop();
+                      _mostraIndirizzoDialog(context);
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Color.fromARGB(120, 81, 87, 100),
+                      backgroundColor: const Color.fromARGB(120, 81, 87, 100),
                     ),
                   ),
-                  SizedBox(width: 20), // Spazio tra i due bottoni
+                  const SizedBox(width: 20),
                   TextButton(
-                    child: Text(
+                    child: const Text(
                       "Chiudi",
                       style: TextStyle(
                         color: Colors.white,
                       ),
                     ),
                     onPressed: () {
-                      Navigator.of(context).pop(); // Chiudi il dialog
+                      Navigator.of(context).pop(); // Chiude il dialog
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Color.fromARGB(120, 81, 87, 100),
+                      backgroundColor: const Color.fromARGB(120, 81, 87, 100),
                     ),
                   ),
                 ],
@@ -294,5 +298,48 @@ class _CarrelloState extends State<CarrelloPage> {
     );
   }
 
-//TODO sbaglia quantità
+  void _mostraIndirizzoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          title: const Text(
+            "Inserisci indirizzo",
+            textAlign: TextAlign.center,
+          ),
+          content: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _indirizzocontroller,
+                  decoration: InputDecoration(
+                    hintText: 'Indirizzo',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    OrdineService().creaOrdine(cc, _indirizzocontroller.text);
+                    getc();
+                  });
+                  Navigator.of(context).pop(); // Chiude la dialog dopo aver inviato l'indirizzo
+                },
+                icon: const Icon(Icons.done),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+
 }

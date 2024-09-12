@@ -4,6 +4,7 @@ import com.example.gioia.eccezioni.*;
 import com.example.gioia.entity.*;
 
 import com.example.gioia.repositories.CarrelloRepository;
+import com.example.gioia.security.authentication.Utils;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -84,7 +85,7 @@ public class CarrelloService {
                 carrello.setCliente(cliente);
                carrelloRepository.save(carrello);
                cliente.setCarrello(carrello);
-               clienteRepository.save(cliente);
+               //clienteRepository.save(cliente);
             }
             Prodotto prodotto = prodottoRepository.findById(prod.getId()).get();
             if (!prodotto.equals(prod))
@@ -143,12 +144,30 @@ public class CarrelloService {
         }
         //ordine
         for(Prodotti_Carrello pc:prodotti){
+            pc.setPrezzo(pc.getProdotto().getPrezzo());
             Prodotto p=pc.getProdotto();
             p.setDisponibilita(p.getDisponibilita()-pc.getQuantita());
             prodottoRepository.save(p);
         }
-        Cliente cliente= carrello.getCliente();
-        System.out.println(cliente);
+        Cliente clienteEsistente = clienteRepository.findById(Utils.getId()).orElseThrow(() -> new RuntimeException("Cliente non trovato"));
+        clienteEsistente.setCarrello(carrello);
+        Ordine ordine= new Ordine();
+        ordine.setCarrello(carrello);
+        ordine.setData(LocalDateTime.now());
+        ordine.setIndirizzo(indirizzo);
+        ordine.setCliente(clienteEsistente);
+        ordineRepository.save(ordine);
+        carrello=new Carrello();
+        carrello.setCliente(clienteEsistente);
+        carrelloRepository.save(carrello);
+        clienteEsistente.setCarrello(carrello);
+        List<Ordine> ordini= clienteEsistente.getOrdini();
+        if(ordini==null)
+            ordini= new ArrayList<>();
+        ordini.add(ordine);
+        clienteEsistente.setOrdini(ordini);
+        clienteRepository.save(clienteEsistente);
+        /*Cliente cliente= carrello.getCliente();
         Ordine ordine= new Ordine();
         ordine.setCarrello(carrello);
         ordine.setData(LocalDateTime.now());
@@ -164,7 +183,7 @@ public class CarrelloService {
             ordini= new ArrayList<>();
         ordini.add(ordine);
         cliente.setOrdini(ordini);
-        clienteRepository.save(cliente);
+        clienteRepository.save(cliente);*/
         return ordine;
     }
 
@@ -219,6 +238,7 @@ public class CarrelloService {
             res.add(p.getProdotto());
         return res;
     }
+
     @Transactional(readOnly = true)
     public List<Prodotto> mostraProdottiCarrello(int carrello) throws NessunOrdine {
         if(!carrelloRepository.existsById(carrello))

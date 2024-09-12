@@ -45,7 +45,7 @@ public class Prodotti_Carrello {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Prodotti_Carrello that = (Prodotti_Carrello) o;
-        return id == that.id && quantita == that.quantita && Objects.equals(carrello, that.carrello) && Objects.equals(prodotto, that.prodotto);
+        return id == that.id && quantita == that.quantita && Objects.equals(prodotto, that.prodotto);
     }
 }
 

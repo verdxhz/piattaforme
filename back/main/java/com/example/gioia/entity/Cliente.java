@@ -43,7 +43,7 @@ public class Cliente {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Cliente cliente = (Cliente) o;
-        return Objects.equals(nome, cliente.nome);
+        return Objects.equals(nome, cliente.nome) && Objects.equals(id_cliente, cliente.id_cliente);
     }
 
 }

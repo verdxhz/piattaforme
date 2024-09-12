@@ -108,6 +108,7 @@ public class CarrelloController {
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }
+
     @GetMapping("/prodottic")
     public ResponseEntity getProdotticarrello(@RequestParam int carrello){
         try{
@@ -120,6 +121,7 @@ public class CarrelloController {
 
 
     }
+
     @GetMapping("/carrello")
     @PreAuthorize("hasRole('utente')")
     public ResponseEntity getCarrello(){
