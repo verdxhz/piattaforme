@@ -7,6 +7,7 @@ import 'package:gioiafront/entity/Carrello.dart';
 import 'package:gioiafront/entity/Cliente.dart';
 import 'package:gioiafront/entity/Ordine.dart';
 import 'package:gioiafront/entity/Prodotti_Carrello.dart';
+import 'package:toastification/toastification.dart';
 
 import '../entity/Prodotto.dart';
 
@@ -211,8 +212,31 @@ class _CarrelloState extends State<CarrelloPage> {
   }
 
   void aggiungi(Prodotto prodotto) async {
+    int q = 0;
+    for (Prodotti_Carrello p in cc.prodotti) {
+      if (p.prodotto.id == prodotto.id)
+        q = p.quantita;
+    }
+    if((q+1)>prodotto.disponibilita)
+      {
+        toastification.show(
+          context: context,
+          type: ToastificationType.warning,
+          style: ToastificationStyle.minimal,
+          title: Text("Errore nel carrello"),
+          description: Text("hai superato la disponibilità del prodotto"),
+          alignment: Alignment.centerRight,
+          autoCloseDuration: const Duration(seconds: 4),
+          primaryColor: Color(0xff000000),
+          borderRadius: BorderRadius.circular(4.0),
+          boxShadow: highModeShadow,
+          showProgressBar: false,
+          applyBlurEffect: true,
+        );
+      }
+    else{
     await CarrelloService().aggiungiCarrello(prodotto);
-    getc();
+    getc();}
   }
 
   void rimuovi(Prodotto prodotto) async {
