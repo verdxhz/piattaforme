@@ -15,7 +15,7 @@ class OrdiniPage extends StatefulWidget {
   State<OrdiniPage> createState() => _OrdiniState();
 }
 
-class _OrdiniState extends State<OrdiniPage> with TickerProviderStateMixin {
+class _OrdiniState extends State<OrdiniPage>{
   Future<List<Ordine>> ordini = Future(() => []);
 
   @override

@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.example.gioia.service.ClientiService;
+import com.example.gioia.service.*;//ClientiService;
 import java.util.List;
 
 @RestController
@@ -25,7 +25,7 @@ public class ClientiController {
         try{
             Cliente res = clientiService.registaCliente(cliente);
             return new ResponseEntity(res, HttpStatus.OK);
-        }catch(UtenteEsistente e){
+        }catch(UtenteEsistente e ){
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }

@@ -2,7 +2,6 @@ package com.example.gioia.service;
 
 import com.example.gioia.eccezioni.UtenteEsistente;
 import com.example.gioia.eccezioni.UtenteNonTrovato;
-import com.example.gioia.entity.Carrello;
 import com.example.gioia.entity.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import com.example.gioia.repositories.ClienteRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 @Service
 public class ClientiService {
@@ -85,4 +83,3 @@ public class ClientiService {
             throw new UtenteNonTrovato("non ci sono utenti registrati a questo nome");
     }
     }
-
