@@ -7,6 +7,8 @@ import 'package:gioiafront/entity/Carrello.dart';
 import 'package:gioiafront/entity/Cliente.dart';
 import 'package:gioiafront/entity/Ordine.dart';
 import 'package:gioiafront/entity/Prodotti_Carrello.dart';
+import 'package:gioiafront/screen/account.dart';
+import 'package:gioiafront/screen/ordini.dart';
 import 'package:toastification/toastification.dart';
 
 import '../entity/Prodotto.dart';
@@ -15,10 +17,10 @@ class CarrelloPage extends StatefulWidget {
   const CarrelloPage({super.key});
 
   @override
-  State<CarrelloPage> createState() => _CarrelloState();
+  State<CarrelloPage> createState() => CarrelloState();
 }
 
-class _CarrelloState extends State<CarrelloPage> {
+class CarrelloState extends State<CarrelloPage> {
   Future<List<Prodotto>> prodotti = Future(() => []);
   late Future<Carrello> carrello;
   late Carrello cc;
@@ -351,9 +353,12 @@ class _CarrelloState extends State<CarrelloPage> {
                 onPressed: () {
                   setState(() {
                     OrdineService().creaOrdine(cc, _indirizzocontroller.text);
-                    getc();
+
                   });
-                  Navigator.of(context).pop(); // Chiude la dialog dopo aver inviato l'indirizzo
+                  Navigator.of(context).pop();
+                  setState(() {
+                    getc();
+                  });// Chiude la dialog dopo aver inviato l'indirizzo
                 },
                 icon: const Icon(Icons.done),
               ),

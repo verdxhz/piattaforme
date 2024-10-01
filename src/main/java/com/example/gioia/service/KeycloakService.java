@@ -1,7 +1,9 @@
 package com.example.gioia.service;
 
 import com.example.gioia.eccezioni.UtenteEsistente;
+import com.example.gioia.entity.Carrello;
 import com.example.gioia.entity.Cliente;
+import com.example.gioia.repositories.CarrelloRepository;
 import com.example.gioia.repositories.ClienteRepository;
 import com.example.gioia.security.authentication.UserRegistrationRecord;
 import jakarta.transaction.Transactional;
@@ -31,21 +33,27 @@ import java.util.*;
 
         @Autowired
         private ClienteRepository clienteRepository;
+    @Autowired
+    private CarrelloRepository carrelloRepository;
 
-        @Override
+    @Override
         @Transactional(rollbackOn = Exception.class)
         public ResponseEntity createUser(UserRegistrationRecord uss) throws Exception, UtenteEsistente {
             if (uss == null) throw new Exception();
 
             Cliente c= new Cliente();
             c.setNome(uss.nome());
+            Carrello cart = new Carrello();
+            cart.setCliente(c);
+            carrelloRepository.save(cart);
+            c.setCarrello(cart);
             Cliente nuovo = clienteRepository.save(c);
 
             Keycloak keycloak= KeycloakBuilder.builder().
                     serverUrl("http://localhost:8180").
                     realm("gioia").
-                    grantType(OAuth2Constants.CLIENT_CREDENTIALS).
-                    clientId("admin_cli").
+                    grantType(OAuth2Constants.PASSWORD).
+                    clientId("admin-cli").
                     clientSecret("UubJ2PW7y2i2F7qHJ0wD3sKaVfUl0W5y").
                     username("admin").password("pass").
                     build();
@@ -69,7 +77,7 @@ import java.util.*;
 
             Integer idToSave = nuovo.getId_cliente();
             Map<String, List<String>> attributes = new HashMap<>();
-            attributes.put("UserId", Collections.singletonList(idToSave.toString()));
+            attributes.put("userId", Collections.singletonList(idToSave.toString()));
             attributes.put("origin",Arrays.asList("demo"));
             user.setAttributes(attributes);
 
@@ -77,7 +85,7 @@ import java.util.*;
             UsersResource us= realm.users();
 
             Response response = us.create(user);
-            if(response.getStatus()==201){
+            if(response.getStatus()==Response.Status.CREATED.getStatusCode()){
                 String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
 
                 ClientRepresentation clientRep = realm.clients().findByClientId("admin-cli").get(0);

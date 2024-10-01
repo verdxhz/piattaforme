@@ -35,7 +35,7 @@ class ClienteService{
   Future<bool> registra(UserRegistrationDto userDto) async {
     //String? aut= Authenticator().getToken();
     try{
-    final response = await http.post(Uri.parse('http://localhost:8081/keycloak'), headers: {'Content-Type': 'application/json',}, body: json.encode(userDto.toJson()),);
+    final response = await http.post(Uri.parse('http://localhost:8081/keycloak/create'), headers: {'Content-Type': 'application/json',}, body: json.encode(userDto.toJson()),);
     print('Status code: ${response.statusCode}');
     print('Response body: ${response.body}');
 

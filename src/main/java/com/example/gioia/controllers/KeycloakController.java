@@ -13,7 +13,7 @@ class KeycloakController {
     @Autowired
     private final KeycloakUserService keycloakUserService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity create(@RequestBody UserRegistrationRecord userRegistrationRecord) throws Exception {
 
 
