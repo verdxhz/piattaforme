@@ -209,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
                   filled: true,
                   fillColor: Colors.white,
                 ),
-                obscureText: true,
+                obscureText: false,
               ),
             ),
             const SizedBox(height: 16.0),

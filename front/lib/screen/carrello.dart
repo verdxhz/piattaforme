@@ -12,7 +12,7 @@ import 'package:gioiafront/screen/ordini.dart';
 import 'package:toastification/toastification.dart';
 
 import '../entity/Prodotto.dart';
-
+late Carrello cc;
 class CarrelloPage extends StatefulWidget {
   const CarrelloPage({super.key});
 
@@ -23,7 +23,7 @@ class CarrelloPage extends StatefulWidget {
 class CarrelloState extends State<CarrelloPage> {
   Future<List<Prodotto>> prodotti = Future(() => []);
   late Future<Carrello> carrello;
-  late Carrello cc;
+
   TextEditingController _indirizzocontroller= TextEditingController();
 
   @override
@@ -35,8 +35,6 @@ class CarrelloState extends State<CarrelloPage> {
   void getc() async {
     carrello = CarrelloService().getCarrello();
     cc = await carrello;
-    // debugPrint('${cc.id}');
-
    getp(cc.id);
   }
 
@@ -350,16 +348,15 @@ class CarrelloState extends State<CarrelloPage> {
                 ),
               ),
               IconButton(
-                onPressed: () {
-                  setState(() {
-                    OrdineService().creaOrdine(cc, _indirizzocontroller.text);
+                onPressed: () async {
 
-                  });
-                  Navigator.of(context).pop();
+                  await OrdineService().creaOrdine(cc, _indirizzocontroller.text);
+
                   setState(() {
                     getc();
                   });// Chiude la dialog dopo aver inviato l'indirizzo
-                },
+                  Navigator.of(context).pop();
+                  },
                 icon: const Icon(Icons.done),
               ),
             ],
