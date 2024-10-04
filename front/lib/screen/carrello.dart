@@ -23,25 +23,28 @@ class CarrelloPage extends StatefulWidget {
 class CarrelloState extends State<CarrelloPage> {
   Future<List<Prodotto>> prodotti = Future(() => []);
   late Future<Carrello> carrello;
-
+  bool isLoading = true; // Aggiungi un flag di caricamento
   TextEditingController _indirizzocontroller= TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    cc = Carrello(id: 0, prodotti: [], cliente: Cliente(nome: ' ', id_cliente: -1));
     getc();
   }
 
   void getc() async {
-    carrello = CarrelloService().getCarrello();
-    cc = await carrello;
-   getp(cc.id);
+
+      carrello = CarrelloService().getCarrello();
+      cc = await carrello;
+      getp();
+
   }
 
-  void getp(int id) {
+  void getp() {
     setState(() {
      // lineeordine = cc.prodotti;
-      prodotti = CarrelloService().getProdottiCarrello(id);
+      prodotti = CarrelloService().getProdottiCarrello(cc.id);
     });
   }
 
