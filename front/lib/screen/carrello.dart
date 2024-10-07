@@ -374,7 +374,8 @@ class CarrelloState extends State<CarrelloPage> {
                     setState(() {
                       getc();
                     });
-                    Navigator.of(context).pop();},
+                    Navigator.of(context).pop();if(r) Navigator.pop(context, true);},
+
                 icon: const Icon(Icons.done),
               ),
             ],
