@@ -259,7 +259,7 @@ class CarrelloState extends State<CarrelloPage> {
   String totaleconto() {
     double conto = 0;
     for (Prodotti_Carrello p in cc.prodotti) {
-      conto += (p.quantita * p.prezzo);
+      conto += (p.quantita * p.prodotto.prezzo);
     }
     return 'totale=$conto €';
   }
@@ -352,14 +352,29 @@ class CarrelloState extends State<CarrelloPage> {
               ),
               IconButton(
                 onPressed: () async {
-
-                  await OrdineService().creaOrdine(cc, _indirizzocontroller.text);
-
-                  setState(() {
-                    getc();
-                  });// Chiude la dialog dopo aver inviato l'indirizzo
-                  Navigator.of(context).pop();
-                  },
+                    bool r= await OrdineService().creaOrdine(
+                        cc, _indirizzocontroller.text);
+                      toastification.show(
+                        context: context,
+                        type:r? ToastificationType.success : ToastificationType.error,
+                        style: ToastificationStyle.minimal,
+                        title:r? Text(""): Text("Errore"),
+                        description: r? Text("ordine effettuato"):Text("errore durante l'ordine, riprovare"),
+                        alignment: Alignment.center,
+                        autoCloseDuration: const Duration(seconds: 4),
+                        primaryColor: Color(0xff000000),
+                        foregroundColor: Color(0xff000000),
+                        borderRadius: BorderRadius.circular(4.0),
+                        showProgressBar: false,
+                        boxShadow: highModeShadow,
+                        closeButtonShowType: CloseButtonShowType.onHover,
+                        pauseOnHover: false,
+                        applyBlurEffect: true,
+                      );
+                    setState(() {
+                      getc();
+                    });
+                    Navigator.of(context).pop();},
                 icon: const Icon(Icons.done),
               ),
             ],

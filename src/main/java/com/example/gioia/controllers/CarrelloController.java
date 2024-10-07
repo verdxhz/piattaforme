@@ -40,6 +40,7 @@ public class CarrelloController {
             Carrello res= carrelloService.addProdottiCarrello(Utils.getId(), prodotto);
             return new ResponseEntity(res, HttpStatus.OK);
         }catch (UtenteNonTrovato | ProdottoInesistente | ProdottoErrato e){
+            e.printStackTrace();
             return new ResponseEntity(e, HttpStatus.BAD_REQUEST);
         }
     }

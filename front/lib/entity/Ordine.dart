@@ -35,7 +35,7 @@ class Ordine {
 }
 
 class OrdineService {
-  Future<void> creaOrdine(Carrello c, String indirizzo) async {
+  Future<bool> creaOrdine(Carrello c, String indirizzo) async {
     final response = await http.post(
       Uri.parse('http://localhost:8081/carrello?indirizzo=$indirizzo'), headers: {
         'Authorization': 'Bearer ${Authenticator().getToken()}','Content-Type': 'application/json'
@@ -43,9 +43,9 @@ class OrdineService {
       body: jsonEncode(c.toJson()),
     );
     if (response.statusCode == 200) {
-      return;
+      return true;
     } else {
-      throw Exception('Failed to create order. Status code: ${response.statusCode}');
+      return false;//throw Exception('Failed to create order. Status code: ${response.statusCode}');
     }
   }
 

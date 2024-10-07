@@ -15,14 +15,13 @@ class OrdiniPage extends StatefulWidget {
   State<OrdiniPage> createState() => _OrdiniState();
 }
 
-class _OrdiniState extends State<OrdiniPage>{
+class _OrdiniState extends State<OrdiniPage> {
   Future<List<Ordine>> ordini = Future(() => []);
 
   @override
   void initState() {
     super.initState();
     getc();
-
   }
 
   void getc() async {
@@ -32,7 +31,6 @@ class _OrdiniState extends State<OrdiniPage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: FutureBuilder<List<Ordine>>(
         future: ordini,
         builder: (context, snapshot) {
@@ -59,10 +57,15 @@ class _OrdiniState extends State<OrdiniPage>{
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ListTile(
-                          title: Text(
-                              '${ordine.data.day}-${ordine.data.month}-${ordine.data.year}'),
-                          subtitle: Row(children: [Text('${ordine.indirizzo}'),Expanded(child: SizedBox()), getConto(ordine)],)
-                        ),
+                            title: Text(
+                                '${ordine.data.day}-${ordine.data.month}-${ordine.data.year}'),
+                            subtitle: Row(
+                              children: [
+                                Text('${ordine.indirizzo}'),
+                                Expanded(child: SizedBox()),
+                                getConto(ordine)
+                              ],
+                            )),
                         FutureBuilder<List<Prodotto>>(
                           future: OrdineService().getProdottiOrdine(ordine.id),
                           builder: (context, snapshot) {
@@ -98,14 +101,14 @@ class _OrdiniState extends State<OrdiniPage>{
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   prodotto.nome,
                                                   style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
-                                                      FontWeight.bold),
+                                                          FontWeight.bold),
                                                 ),
                                                 const SizedBox(height: 5),
                                                 Text(prodotto.descrizione),
@@ -113,13 +116,22 @@ class _OrdiniState extends State<OrdiniPage>{
                                             ),
                                           ),
                                           const SizedBox(width: 10),
-                                          Text(
-                                            '${prodotto.prezzo.toString()} €',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                          Column( children: [Text(
+                                              '${prezzo(ordine, prodotto.id)} €',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                           ),
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              'x${quantita(ordine, prodotto.id)}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ] ),
+
                                         ],
                                       ),
                                     ),
@@ -146,15 +158,21 @@ class _OrdiniState extends State<OrdiniPage>{
     );
   }
 
-
-
-
-
- Widget getConto(Ordine ordine) {
-    double conto=0;
-    Carrello c=ordine.carrello;
-    for (Prodotti_Carrello p in c.prodotti)
-      conto+=p.prezzo;
+  Widget getConto(Ordine ordine) {
+    double conto = 0;
+    Carrello c = ordine.carrello;
+    for (Prodotti_Carrello p in c.prodotti) conto += p.prezzo * p.quantita;
     return Text('totale: $conto €');
- }
+  }
+
+  prezzo(Ordine o, int idp) {
+    for (Prodotti_Carrello p in o.carrello.prodotti) {
+      if (p.prodotto.id == idp) return '${p.prezzo}';
+    }
+  }
+  quantita(Ordine o, int idp) {
+    for (Prodotti_Carrello p in o.carrello.prodotti) {
+      if (p.prodotto.id == idp) return '${p.quantita}';
+    }
+  }
 }
