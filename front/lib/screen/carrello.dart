@@ -178,7 +178,7 @@ class CarrelloState extends State<CarrelloPage> {
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    TextButton(
+                    totaleconto()=='totale=0 €'? const SizedBox() : TextButton(
                       onPressed: () {
                         mostraMessaggioDialog(context);
                       },

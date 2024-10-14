@@ -211,7 +211,7 @@ class _HomeState extends State<Home> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  TextButton(
+                                  TextButton (
                                       child: Text(prodotto.disponibilita > 0
                                           ? 'Aggiungi al carrello'
                                           : 'Esaurito'),
@@ -231,6 +231,7 @@ class _HomeState extends State<Home> {
                                                     true; // Aggiorna lo stato di login
                                               });
                                             }
+                                            else return;
                                           }
                                           aggiungi(prodotto);
                                           //await CarrelloService().aggiungiCarrello(prodotto);
@@ -254,6 +255,7 @@ class _HomeState extends State<Home> {
                                           );
                                         }
                                       }),
+                                  Text(prodotto.disponibilita<4?"rimanenti: ${prodotto.disponibilita}" : "",style: TextStyle(color: Colors.red, fontSize: 12),)
                                 ],
                               ),
                             ],
